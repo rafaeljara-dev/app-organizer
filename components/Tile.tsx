@@ -16,6 +16,16 @@ export function Ico({ item, className = "" }: { item: Item; className?: string }
       </span>
     );
   }
+  if (item.icon) {
+    // Only a manifest or apple-touch icon is designed to fill a square.
+    const bleed = item.iconSource === "manifest" || item.iconSource === "apple-touch-icon";
+    return (
+      <span className={`ico ${bleed ? "ico--bleed" : "ico--inset"} ${className}`}
+            style={cssVar("--c", item.c)}>
+        <img src={item.icon} alt="" loading="lazy" decoding="async" />
+      </span>
+    );
+  }
   return (
     <span className={`ico ${className}`} style={cssVar("--c", item.c)}>
       <Glyph name={item.g} />

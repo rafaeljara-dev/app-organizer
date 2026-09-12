@@ -3,11 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build && node scripts/build-sw.mjs",
+    "dev": "next dev --webpack",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:icons": "node scripts/test-icons.mjs",
+    "test:ui": "PORT_UNDER_TEST=3390 node scripts/e2e-icons.mjs",
+    "test:sw": "PORT_UNDER_TEST=3391 node scripts/sw-check.mjs"
   },
   "dependencies": {
     "next": "16.3.5",
@@ -16,6 +19,7 @@
   },
   "devDependencies": {
     "@serwist/build": "^9.5.12",
+    "@serwist/next": "^9.5.12",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^22",
     "@types/react": "^19",

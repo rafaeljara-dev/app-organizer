@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Icon } from "@/lib/glyphs";
+import { fetchIcon, hydrateIcons } from "@/lib/icon-client";
 import { boot, update, useDoc } from "@/lib/store";
 import { isFolder, type AppItem, type Doc, type Folder, type Item } from "@/lib/types";
 import Dock from "./Dock";
@@ -38,6 +39,7 @@ export default function Home() {
   const [toast, setToast] = useState("");
   const trackRef = useRef<HTMLDivElement>(null);
   const toastTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const hydrated = useRef(false);
 
   useEffect(() => { void boot(); }, []);
 
@@ -66,6 +68,34 @@ export default function Home() {
   useEffect(() => {
     document.documentElement.dataset.edit = edit ? "1" : "0";
   }, [edit]);
+
+  // The shelf ships with real addresses, so on the first run it goes and
+  // gets each site's own icon instead of showing our stand-in glyphs.
+  useEffect(() => {
+    if (!doc || hydrated.current) return;
+    hydrated.current = true;
+    void hydrateIcons(doc);
+  }, [doc]);
+
+  const refreshIcon = useCallback(async (item: AppItem) => {
+    say(`Buscando el icono de ${item.name}`);
+    const r = await fetchIcon(item.url);
+    if (!r.ok) { say(`Sin icono utilizable en ${hostOf(item.url)}`); return; }
+    update((d) => {
+      for (const list of [d.dock, ...d.pages.map((p) => p.items)]) {
+        for (const it of list) {
+          if (it.id === item.id && it.type === "app") {
+            it.icon = r.icon; it.iconSource = r.source; it.iconTried = true; return;
+          }
+          if (it.type === "folder") {
+            const inner = it.items.find((x) => x.id === item.id);
+            if (inner) { inner.icon = r.icon; inner.iconSource = r.source; inner.iconTried = true; return; }
+          }
+        }
+      }
+    });
+    say(`Icono de ${r.name || item.name} actualizado`);
+  }, [say]);
 
   const launch = useCallback((item: AppItem) => {
     say(`Abriendo ${item.name}`);
@@ -337,6 +367,11 @@ export default function Home() {
           {menu && !isFolder(menu.item) && (
             <button onClick={() => { launch(menu.item as AppItem); setMenu(null); }}>
               <Icon name="open" />Abrir
+            </button>
+          )}
+          {menu && !isFolder(menu.item) && (
+            <button onClick={() => { void refreshIcon(menu.item as AppItem); setMenu(null); }}>
+              <Icon name="down" />Actualizar icono
             </button>
           )}
           <button onClick={() => { if (menu) { setTarget(menu.item); setSheet("edit"); } setMenu(null); }}>

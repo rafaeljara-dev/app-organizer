@@ -6,7 +6,10 @@ const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 export default function RegisterSW() {
   useEffect(() => {
-    if (!("serviceWorker" in navigator) || process.env.NODE_ENV !== "production") return;
+    if (process.env.NODE_ENV !== "production") return;
+    // Missing in private windows, on insecure origins, and wherever the
+    // browser has the API switched off. None of that should throw.
+    if (typeof navigator === "undefined" || !navigator.serviceWorker) return;
     const onLoad = () => {
       navigator.serviceWorker
         .register(`${base}/sw.js`, { scope: `${base}/` })

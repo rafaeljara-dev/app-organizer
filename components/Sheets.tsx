@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { CATALOG, SWATCHES } from "@/lib/catalog";
+import { fetchIcon, hydrateIcons, type Progress, type Resolved } from "@/lib/icon-client";
 import { app, uid } from "@/lib/defaults";
 import { Glyph, Icon } from "@/lib/glyphs";
 import { exportJson, importJson, resetDoc, setSetting, update } from "@/lib/store";
@@ -48,6 +49,8 @@ export function SettingsSheet({ open, onClose, doc, onOrganise, onToast }: {
   open: boolean; onClose: () => void; doc: Doc; onOrganise: () => void; onToast: (m: string) => void;
 }) {
   const [json, setJson] = useState("");
+  const [prog, setProg] = useState<Progress | null>(null);
+  const [busy, setBusy] = useState(false);
   const s = doc.settings;
 
   return (
@@ -109,6 +112,40 @@ export function SettingsSheet({ open, onClose, doc, onOrganise, onToast }: {
       </div>
 
       <div className="grp">
+        <h3>Iconos</h3>
+        <p className="hint" style={{ margin: "0 0 12px" }}>
+          Cada sitio publica su propio icono. Estante lo lee de su manifiesto, o de
+          las etiquetas antiguas si no tiene, y lo guarda aquí para que siga estando
+          sin conexión.
+        </p>
+        <div className="btns">
+          <button className="btn ghost" disabled={busy} onClick={async () => {
+            setBusy(true);
+            const r = await hydrateIcons(doc, setProg);
+            setBusy(false);
+            onToast(r.total === 0 ? "Ya están todos" : `${r.ok} de ${r.total} resueltos`);
+          }}>
+            <Icon name="down" style={{ width: 16, height: 16, verticalAlign: -3, marginRight: 7 }} />
+            Traer los que falten
+          </button>
+          <button className="btn ghost" disabled={busy} onClick={async () => {
+            setBusy(true);
+            const r = await hydrateIcons(doc, setProg, { force: true });
+            setBusy(false);
+            onToast(`${r.ok} de ${r.total} resueltos`);
+          }}>
+            Volver a buscar todos
+          </button>
+        </div>
+        {prog && prog.total > 0 && (
+          <>
+            <div className="bar"><i style={{ width: `${Math.round((prog.done / prog.total) * 100)}%` }} /></div>
+            <p className="hint">{prog.done} de {prog.total}, {prog.ok} con icono propio</p>
+          </>
+        )}
+      </div>
+
+      <div className="grp">
         <h3>Organizar</h3>
         <div className="btns">
           <button className="btn ghost" onClick={() => { onOrganise(); onClose(); }}>
@@ -151,7 +188,7 @@ export function SettingsSheet({ open, onClose, doc, onOrganise, onToast }: {
         </div>
         <textarea className="field" value={json} onChange={(e) => setJson(e.target.value)}
                   spellCheck={false} placeholder="El respaldo aparece aquí. Pega uno y pulsa Importar." />
-        <p className="hint">Guarda este texto en un archivo. Es tu copia de seguridad completa, con versión de esquema.</p>
+        <p className="hint">Guarda este texto en un archivo. Lleva todo salvo las imágenes de los iconos, que se vuelven a pedir solas al importar.</p>
       </div>
     </Shell>
   );
@@ -175,6 +212,24 @@ export function AddSheet({ open, onClose, doc, page, onToast }: {
   const [url, setUrl] = useState("");
   const [picked, setPicked] = useState<number[]>([]);
   const [dest, setDest] = useState(page);
+  const [peek, setPeek] = useState<Resolved | null>(null);
+  const [looking, setLooking] = useState(false);
+  const trip = useRef(0);
+
+  // Resolve as they type, but only once they have stopped.
+  useEffect(() => {
+    const candidate = normUrl(url);
+    if (!candidate) { setPeek(null); setLooking(false); return; }
+    const mine = ++trip.current;
+    setLooking(true);
+    const timer = setTimeout(async () => {
+      const r = await fetchIcon(candidate);
+      if (trip.current !== mine) return;
+      setPeek(r);
+      setLooking(false);
+    }, 650);
+    return () => clearTimeout(timer);
+  }, [url]);
 
   const commit = () => {
     const target = doc.pages[dest] ? dest : 0;
@@ -183,8 +238,13 @@ export function AddSheet({ open, onClose, doc, page, onToast }: {
     const u = normUrl(url);
     if (u) {
       const h = hostOf(u);
-      made.push(app(h.split(".")[0].replace(/^./, (c) => c.toUpperCase()), u, "globe",
-        SWATCHES[Math.floor(Math.random() * SWATCHES.length)]));
+      const fallbackName = h.split(".")[0].replace(/^./, (c) => c.toUpperCase());
+      const colour = peek?.ok && /^#[0-9a-f]{6}$/i.test(peek.themeColor ?? "")
+        ? (peek.themeColor as string)
+        : SWATCHES[Math.floor(Math.random() * SWATCHES.length)];
+      const fresh = app(peek?.ok ? peek.name || fallbackName : fallbackName, u, "globe", colour);
+      if (peek?.ok) { fresh.icon = peek.icon; fresh.iconSource = peek.source; fresh.iconTried = true; }
+      made.push(fresh);
       added++;
     }
     for (const i of picked) {
@@ -204,15 +264,25 @@ export function AddSheet({ open, onClose, doc, page, onToast }: {
       <h2>Añadir al estante</h2>
       <p className="sub">Pega una dirección o elige del catálogo.</p>
 
-      <div className="note">
-        <Icon name="info" />
-        <div>Por ahora el icono se elige del catálogo o se genera. Leer el manifiesto del sitio para sacar el icono real necesita un servidor, y esta versión es estática.</div>
-      </div>
-
       <div className="grp">
         <h3>Dirección</h3>
         <input className="field" value={url} onChange={(e) => setUrl(e.target.value)}
-               placeholder="figma.com" inputMode="url" aria-label="Dirección" />
+               placeholder="figma.com" inputMode="url" aria-label="Dirección" autoComplete="off" />
+        {looking && <p className="hint">Leyendo el sitio…</p>}
+        {!looking && peek?.ok && (
+          <div className="iconrow">
+            <Ico item={{ id: "peek", type: "app", name: peek.name, url: normUrl(url),
+                         g: "globe", c: peek.themeColor ?? "#0E7C74",
+                         icon: peek.icon, iconSource: peek.source }} />
+            <div className="m">
+              <b>{peek.name}</b>
+              <span>{peek.host} · icono desde {peek.source}</span>
+            </div>
+          </div>
+        )}
+        {!looking && peek && !peek.ok && (
+          <p className="hint">Ese sitio no publica un icono utilizable. Se añadirá con un glifo.</p>
+        )}
       </div>
 
       <div className="grp">

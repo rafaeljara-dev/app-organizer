@@ -10,6 +10,12 @@ export type AppItem = {
   url: string;
   g: GlyphName;
   c: string;
+  /** The site's own icon as a data URL, once resolved. */
+  icon?: string;
+  /** Which tag it came from; decides whether it fills the tile or sits inside it. */
+  iconSource?: string;
+  /** Set once we have asked, so a site with no icon is not retried forever. */
+  iconTried?: boolean;
 };
 
 export type Folder = {

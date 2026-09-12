@@ -1,7 +1,5 @@
 # Estante
 
-**En vivo: https://rafaeljara-dev.github.io/app-organizer/**
-
 Ábrelo en el móvil y añádelo a la pantalla de inicio para usarlo como app.
 
 Un organizador de webapps que se instala como PWA y las agrupa en una pantalla
@@ -16,9 +14,43 @@ Estante es esa capa que falta.
 
 ## Cómo funciona
 
-Instalas **una** PWA. Dentro pones las direcciones de los servicios que usas.
-Cada entrada recibe icono, color y sitio en una página. Al tocar una, se abre en
-el navegador.
+Instalas **una** PWA. Dentro pegas la dirección de un servicio y ya está: la app
+va al sitio, lee su icono y su nombre, y lo coloca en la página que elijas. Al
+tocarlo se abre en el navegador.
+
+## El icono sale de la dirección
+
+Cada sitio publica su propio icono, y `/api/icon` lo va a buscar por ti. El
+orden importa:
+
+1. **El manifiesto** (`<link rel="manifest">`). Es la fuente autorizada: el
+   sitio dice qué imagen lo representa, en qué tamaños, y de paso su nombre
+   corto y su color de tema.
+2. **`apple-touch-icon`**, normalmente 180 px y ya recortado como cuadrado.
+3. **`<link rel="icon">`**, prefiriendo SVG y descartando los `.ico` de 16 px.
+4. **`og:image`**, que es un banner social y no un icono, pero es mejor que nada.
+5. **`/favicon.ico`**, el último recurso.
+
+Entre varios candidatos gana el que más se acerque a 256 px, penalizando los
+`maskable` porque se dibujan con zona de seguridad y se ven recortados fuera de
+su máscara. El tipo real se decide olfateando los primeros bytes, no fiándose
+de la cabecera `content-type`, que muchas veces miente.
+
+El icono se guarda como data URL en tu dispositivo. Así sigue estando sin
+conexión y no se rompe si el sitio cambia su ruta.
+
+Un icono que llega de un manifiesto o de `apple-touch-icon` es un cuadrado
+terminado y llena la teja. Un favicon o un banner no lo son, así que se dibujan
+dentro de la teja sobre el color de la marca.
+
+### Ese endpoint es una puerta hacia dentro, y está cerrada
+
+Un servicio que busca cualquier dirección que le pasen es un proxy abierto si no
+se defiende. `lib/net-guard.ts` sólo admite `http` y `https`, sólo los puertos
+80 y 443, y resuelve el nombre antes de tocarlo para rechazar todo lo que caiga
+en rango privado: loopback, enlaces locales, el metadato de la nube en
+`169.254.169.254`, las redes internas y las IPv4 escondidas dentro de IPv6. Los
+motivos que devuelve están saneados para no filtrar errores internos.
 
 Se abre siempre fuera de la app, nunca dentro. La mayoría de sitios grandes
 bloquean el empotrado con `X-Frame-Options` o `frame-ancestors`, así que un
@@ -62,15 +94,30 @@ resto se usa Onest, empaquetada con la app.
 npm install
 npm run dev            # http://localhost:3000
 npm run typecheck
-npm run build          # exportación estática en out/ más el service worker
+npm run build          # compilación para Vercel, con el service worker
 ```
 
-Para reproducir la ruta de GitHub Pages en local, construye con
-`GITHUB_PAGES=true npm run build`: eso activa el `basePath` `/app-organizer`.
+Se despliega en Vercel. El complemento de Serwist usa webpack, así que la
+construcción lleva `--webpack`: Next 16 usa Turbopack por defecto y los dos no
+conviven todavía.
 
+### Pruebas
+
+```bash
+npm run test:icons     # resolvedor y guardia de red, contra un sitio de prueba
+npm run build && npm run test:ui    # la interfaz en un navegador real
+npm run build && npm run test:sw    # service worker y arranque sin conexión
+```
+
+`test:icons` levanta un servidor que imita los casos que se dan de verdad: con
+manifiesto, sólo con `apple-touch-icon`, con SVG, con la cabecera mintiendo
+sobre el tipo, con el manifiesto roto, con redirección y sin ningún icono. Las
+pruebas de navegador necesitan Playwright.
 - `app/` rutas, estilos y manifiesto
 - `components/` la interfaz
 - `lib/` tipos, almacén, catálogo e iconos
+- `app/api/icon/` el servicio que saca el icono de una dirección
+- `lib/resolve-icon.ts` la lógica de resolución, y `lib/net-guard.ts` su guardia
 - `worker/sw.ts` el service worker, construido con Serwist
 - `scripts/` generación de iconos, capturas y empaquetado del worker
 - `design/` el prototipo y las direcciones visuales que dieron origen a esto
@@ -82,10 +129,10 @@ glifo y color de marca. Es un archivo de datos, no hace falta tocar nada más.
 
 ## Lo que falta
 
-- Leer el manifiesto del sitio para sacar el icono y el color reales. Necesita
-  un servidor que evite el CORS, y esta versión es estática.
 - Destino de compartir en Android, para mandar una dirección desde el navegador.
 - Sincronización opcional entre dispositivos.
+- Reducir los iconos grandes en el servidor, para que una teja no arrastre
+  cientos de kilobytes.
 
 ## Licencia
 

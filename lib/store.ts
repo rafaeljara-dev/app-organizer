@@ -112,8 +112,28 @@ export function resetDoc() {
   replaceDoc(defaultDoc());
 }
 
+/**
+ * The backup leaves the icon images out. They are megabytes of base64 that
+ * the app can fetch again in one tap, and a backup you cannot paste into a
+ * message is not much of a backup.
+ */
 export function exportJson(): string {
-  return JSON.stringify(doc, null, 2);
+  if (!doc) return "";
+  const strip = <T extends { icon?: string; iconSource?: string; iconTried?: boolean }>(a: T): T => {
+    const { icon, iconSource, iconTried, ...rest } = a;
+    return rest as T;
+  };
+  const lean: Doc = {
+    ...doc,
+    dock: doc.dock.map(strip),
+    pages: doc.pages.map((p) => ({
+      ...p,
+      items: p.items.map((it) =>
+        it.type === "folder" ? { ...it, items: it.items.map(strip) } : strip(it),
+      ),
+    })),
+  };
+  return JSON.stringify(lean, null, 2);
 }
 
 export function importJson(text: string): boolean {

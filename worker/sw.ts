@@ -2,23 +2,45 @@
 import {
   CacheFirst,
   ExpirationPlugin,
+  NetworkFirst,
   Serwist,
   StaleWhileRevalidate,
   type PrecacheEntry,
+  type SerwistGlobalConfig,
 } from "serwist";
 
-declare const self: ServiceWorkerGlobalScope & {
-  __SW_MANIFEST: (PrecacheEntry | string)[];
-};
+declare global {
+  interface WorkerGlobalScope extends SerwistGlobalConfig {
+    __SW_MANIFEST: (PrecacheEntry | string)[] | undefined;
+  }
+}
+declare const self: ServiceWorkerGlobalScope;
 
 const serwist = new Serwist({
   precacheEntries: self.__SW_MANIFEST,
-  precacheOptions: { cleanupOutdatedCaches: true, directoryIndex: "index.html" },
+  precacheOptions: { cleanupOutdatedCaches: true },
   skipWaiting: true,
   clientsClaim: true,
+  navigationPreload: true,
   runtimeCaching: [
     {
-      // Self-hosted faces never change without a new filename.
+      // The shell itself: serve fast, refresh in the background.
+      matcher: ({ request }) => request.mode === "navigate",
+      handler: new NetworkFirst({
+        cacheName: "estante-shell",
+        networkTimeoutSeconds: 3,
+        plugins: [new ExpirationPlugin({ maxEntries: 8 })],
+      }),
+    },
+    {
+      // Resolved site icons: expensive to fetch, safe to keep for a month.
+      matcher: ({ url }) => url.pathname === "/api/icon",
+      handler: new StaleWhileRevalidate({
+        cacheName: "estante-icon-api",
+        plugins: [new ExpirationPlugin({ maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 30 })],
+      }),
+    },
+    {
       matcher: ({ request }) => request.destination === "font",
       handler: new CacheFirst({
         cacheName: "estante-fonts",

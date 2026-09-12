@@ -7,3 +7,5 @@ next-env.d.ts
 .DS_Store
 
 .preview/
+public/sw.js
+public/sw.js.map

@@ -355,6 +355,24 @@ input, select, textarea { font: inherit; color: inherit; }
   transition: transform 0.26s var(--ease), box-shadow 0.26s var(--ease);
 }
 .ico svg { width: 44%; height: 44%; }
+
+/* A manifest or apple-touch icon is already a finished square, so it fills
+   the tile. A favicon or a social banner is not, so it sits inside one. */
+.ico img { display: block; }
+/* Plenty of real icons are transparent PNGs. Keeping the brand wash
+   behind them means one never lands as a blank white square. */
+.ico--bleed { background: var(--bg); }
+.ico--bleed img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; }
+.ico--inset img { width: 58%; height: 58%; object-fit: contain; }
+
+.iconrow { display: flex; align-items: center; gap: 13px; padding: 12px 0 4px; }
+.iconrow .ico { width: 54px; height: 54px; flex: 0 0 auto; }
+.iconrow .m { min-width: 0; flex: 1; }
+.iconrow .m b { display: block; font-size: 15px; font-weight: 600; }
+.iconrow .m span { display: block; font-size: 11.5px; color: var(--ink-3); margin-top: 2px; }
+
+.bar { height: 6px; border-radius: 3px; background: var(--track); overflow: hidden; margin-top: 10px; }
+.bar i { display: block; height: 100%; border-radius: 3px; background: var(--accent); transition: width 0.3s var(--ease-soft); }
 .tile:hover .ico { transform: translateY(-2px) scale(1.03); }
 .tile:active .ico { transform: scale(0.9); }
 
