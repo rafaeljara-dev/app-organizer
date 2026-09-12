@@ -1,14 +1,18 @@
 {
+  "pages": [
+    { "id": "page-1", "name": "Diseño" },
+    { "id": "page-2", "name": "Exploración" }
+  ],
   "artboards": [
-    { "file": "Main.dc.html",    "title": "A · Papel",  "x": 0,    "y": 0, "w": 390, "h": 844 },
-    { "file": "Cantera.dc.html", "title": "B · Cantera","x": 490,  "y": 0, "w": 390, "h": 844 },
-    { "file": "Indice.dc.html",  "title": "C · Índice", "x": 980,  "y": 0, "w": 390, "h": 844 }
+    { "file": "Main.dc.html",   "title": "Estante",    "page": "page-1", "x": 0,   "y": 0, "w": 390, "h": 844, "is_interactive": true },
+    { "file": "Papel.dc.html",  "title": "A · Papel",  "page": "page-2", "x": 0,   "y": 0, "w": 390, "h": 844 },
+    { "file": "Indice.dc.html", "title": "C · Índice", "page": "page-2", "x": 490, "y": 0, "w": 390, "h": 844 }
   ],
   "annotations": [
-    { "id": "nota-a", "x": 0,   "y": -150, "w": 390, "text": "A · PAPEL\nTeja neutra con borde fino; el color de marca vive solo en el trazo del icono. Etiquetas siempre visibles.\nA favor: lo más silencioso, envejece bien, ninguna app grita más que otra.\nEn contra: tardas más en encontrar algo de un vistazo, porque el color ya no hace de atajo." },
-    { "id": "nota-b", "x": 490, "y": -150, "w": 390, "text": "B · CANTERA\nColor de marca lavado sobre fondo cálido, sin etiquetas, objetivos grandes y sombra suave.\nA favor: reconoces Spotify o Figma sin leer; es el que más se siente un home screen.\nEn contra: con 40 apps el color deja de distinguir y vuelve el ruido visual." },
-    { "id": "nota-c", "x": 980, "y": -150, "w": 390, "text": "C · ÍNDICE\nFilas tipográficas agrupadas por sección, con el dominio a la derecha. Sin cuadrícula.\nA favor: escala a cientos de apps, se lee por nombre, hecho para buscar y teclear.\nEn contra: rompe la metáfora de pantalla de inicio que elegiste; se parece más a un índice que a un escritorio." },
-    { "id": "nota-comun", "x": 0, "y": 920, "w": 860, "text": "Las tres comparten las mismas apps reales y el mismo color de marca por app. Cambia el tratamiento, no los datos.\nChip Tema: cada tablero alterna claro y oscuro. Chip Cuadrícula: columnas en A y B." }
+    { "id": "nota-uso", "page": "page-1", "x": 480, "y": 0, "w": 330, "text": "TÓCALO\n\nLupa abajo a la derecha: el dock se convierte en el campo de búsqueda y aparecen los recientes. Vuelve a tocarla para cerrar.\n\nEngrane arriba: hoja de ajustes con Vista (Cuadrícula o Lista), Columnas, Etiquetas y Tema." },
+    { "id": "nota-cambios", "page": "page-1", "x": 480, "y": 330, "w": 330, "text": "QUÉ CAMBIÓ FRENTE A B\n\nLa búsqueda bajó al pulgar y ya no vive arriba.\n\nLa vista de lista de C entró como ajuste, no como pantalla aparte: mismas apps, mismo color lavado, tipografía de B.\n\nEl resto de B queda igual: color de marca lavado, sin etiquetas por defecto, objetivos grandes, sombra suave." },
+    { "id": "nota-papel", "page": "page-2", "x": 0, "y": -300, "w": 390, "text": "A · PAPEL (descartada)\n\nTeja neutra con borde fino; el color de marca solo en el trazo del icono.\n\nLo más silencioso, pero pierdes el color como atajo para encontrar algo de un vistazo." },
+    { "id": "nota-indice", "page": "page-2", "x": 490, "y": -300, "w": 390, "text": "C · ÍNDICE (absorbida)\n\nFilas agrupadas por sección con el dominio a la derecha.\n\nEscala a cientos de apps. Ahora vive dentro del diseño elegido como la opción Lista de los ajustes." }
   ],
-  "launch": { "view": "canvas" }
+  "launch": { "view": "canvas", "page": "page-1" }
 }

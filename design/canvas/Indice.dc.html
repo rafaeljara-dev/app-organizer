@@ -20,7 +20,7 @@
   <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
     <div style="display: flex; flex-direction: column; gap: 4px;">
       <div style="font-size: 19px; font-weight: 600; letter-spacing: -0.02em; line-height: 1;">Estante</div>
-      <div style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 9.5px; letter-spacing: 0.1em; color: {{t.faint}};">24 APPS / 3 PÁGINAS</div>
+      <div style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 9.5px; letter-spacing: 0.1em; color: {{t.faint}};">10 APPS / 3 PÁGINAS</div>
     </div>
     <div style="display: flex; gap: 2px;">
       <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: {{t.ink2}};">
@@ -88,9 +88,9 @@ class Component extends DCLogic {
   renderVals() {
     const dark = this.props.dark ?? false;
     const t = dark
-      ? { bg: '#141517', ink: '#EAECEE', ink2: '#9BA3AA', faint: '#6B747B', line: '#232629',
+      ? { bg: '#141517', ink: '#EAECEE', ink2: '#9BA3AA', faint: '#8A939A', line: '#232629',
           rule: '#333940', field: '#1B1D20', chip: '#262A2E', base: '#1B1D20', accent: '#F08A4B' }
-      : { bg: '#FCFCFD', ink: '#1B1D20', ink2: '#4B5158', faint: '#949BA2', line: '#EDEEF0',
+      : { bg: '#FCFCFD', ink: '#1B1D20', ink2: '#4B5158', faint: '#6E757C', line: '#EDEEF0',
           rule: '#D8DBDE', field: '#FFFFFF', chip: '#F0F1F3', base: '#FFFFFF', accent: '#C2521C' };
 
     const row = (name, host, icon, c) => ({
@@ -100,7 +100,7 @@ class Component extends DCLogic {
     });
 
     const sections = [
-      { name: 'DIARIO', count: '8', rows: [
+      { name: 'DIARIO', count: '6', rows: [
         row('Calendario', 'calendar.google.com', 'cal', '#2F6FD0'),
         row('Drive', 'drive.google.com', 'cloud', '#3D8BFD'),
         row('Fotos', 'photos.google.com', 'img', '#E4572E'),
@@ -108,7 +108,7 @@ class Component extends DCLogic {
         row('YouTube', 'youtube.com', 'play', '#C4302B'),
         row('Traductor', 'translate.google.com', 'globe', '#1F7AE0')
       ]},
-      { name: 'CREAR', count: '9', rows: [
+      { name: 'CREAR', count: '4', rows: [
         row('Figma', 'figma.com', 'pen', '#A259FF'),
         row('Notion', 'notion.so', 'doc', '#6B6B6B'),
         row('Linear', 'linear.app', 'list', '#5E6AD2'),
