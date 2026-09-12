@@ -1,0 +1,14 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html",    "title": "A · Papel",  "x": 0,    "y": 0, "w": 390, "h": 844 },
+    { "file": "Cantera.dc.html", "title": "B · Cantera","x": 490,  "y": 0, "w": 390, "h": 844 },
+    { "file": "Indice.dc.html",  "title": "C · Índice", "x": 980,  "y": 0, "w": 390, "h": 844 }
+  ],
+  "annotations": [
+    { "id": "nota-a", "x": 0,   "y": -150, "w": 390, "text": "A · PAPEL\nTeja neutra con borde fino; el color de marca vive solo en el trazo del icono. Etiquetas siempre visibles.\nA favor: lo más silencioso, envejece bien, ninguna app grita más que otra.\nEn contra: tardas más en encontrar algo de un vistazo, porque el color ya no hace de atajo." },
+    { "id": "nota-b", "x": 490, "y": -150, "w": 390, "text": "B · CANTERA\nColor de marca lavado sobre fondo cálido, sin etiquetas, objetivos grandes y sombra suave.\nA favor: reconoces Spotify o Figma sin leer; es el que más se siente un home screen.\nEn contra: con 40 apps el color deja de distinguir y vuelve el ruido visual." },
+    { "id": "nota-c", "x": 980, "y": -150, "w": 390, "text": "C · ÍNDICE\nFilas tipográficas agrupadas por sección, con el dominio a la derecha. Sin cuadrícula.\nA favor: escala a cientos de apps, se lee por nombre, hecho para buscar y teclear.\nEn contra: rompe la metáfora de pantalla de inicio que elegiste; se parece más a un índice que a un escritorio." },
+    { "id": "nota-comun", "x": 0, "y": 920, "w": 860, "text": "Las tres comparten las mismas apps reales y el mismo color de marca por app. Cambia el tratamiento, no los datos.\nChip Tema: cada tablero alterna claro y oscuro. Chip Cuadrícula: columnas en A y B." }
+  ],
+  "launch": { "view": "canvas" }
+}

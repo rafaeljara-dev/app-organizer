@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <style>
+    body { margin: 0; font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif; }
+    a { color: #b44a18; } a:hover { color: #8d3a12; }
+    * { box-sizing: border-box; }
+  </style>
+</helmet>
+
+<div style="width: 390px; height: 844px; display: flex; flex-direction: column; padding: 26px 22px 22px; background: {{t.bg}}; color: {{t.ink}}; overflow: hidden;">
+
+  <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+    <div style="display: flex; flex-direction: column; gap: 4px;">
+      <div style="font-size: 19px; font-weight: 600; letter-spacing: -0.02em; line-height: 1;">Estante</div>
+      <div style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 9.5px; letter-spacing: 0.1em; color: {{t.faint}};">24 APPS / 3 PÁGINAS</div>
+    </div>
+    <div style="display: flex; gap: 2px;">
+      <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: {{t.ink2}};">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+      </div>
+      <div style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: {{t.ink2}};">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M12 3v2.2M12 18.8V21M21 12h-2.2M5.2 12H3M18.4 5.6l-1.6 1.6M7.2 16.8l-1.6 1.6M18.4 18.4l-1.6-1.6M7.2 7.2 5.6 5.6"></path></svg>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 10px; height: 44px; margin-top: 18px; padding: 0 13px; border: 1px solid {{t.line}}; border-radius: 9px; background: {{t.field}}; color: {{t.faint}};">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><path d="m15.8 15.8 4.7 4.7"></path></svg>
+    <span style="font-size: 14px; flex: 1;">Escribe para filtrar</span>
+    <span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 10px; padding: 3px 6px; border-radius: 5px; background: {{t.chip}}; color: {{t.faint}};">/</span>
+  </div>
+
+  <sc-for list="{{sections}}" as="sec" hint-placeholder-count="2">
+    <div style="margin-top: 26px;">
+      <div style="display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 9px; border-bottom: 1px solid {{t.rule}};">
+        <div style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 9.5px; letter-spacing: 0.15em; color: {{t.ink2}};">{{sec.name}}</div>
+        <div style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 9.5px; color: {{t.accent}};">{{sec.count}}</div>
+      </div>
+      <sc-for list="{{sec.rows}}" as="it" hint-placeholder-count="6">
+        <div style="display: flex; align-items: center; gap: 12px; height: 46px; border-bottom: 1px solid {{t.line}};">
+          <div style="width: 28px; height: 28px; flex: 0 0 auto; border-radius: 8px; background: {{it.bg}}; display: flex; align-items: center; justify-content: center; color: {{it.glyph}};">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><use href="{{it.icon}}"></use></svg>
+          </div>
+          <div style="font-size: 14px; font-weight: 500; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{it.name}}</div>
+          <div style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 10px; color: {{t.faint}};">{{it.host}}</div>
+        </div>
+      </sc-for>
+    </div>
+  </sc-for>
+
+  <div style="margin-top: auto; display: flex; border-top: 1px solid {{t.rule}}; padding-top: 2px;">
+    <sc-for list="{{tabs}}" as="tab" hint-placeholder-count="3">
+      <div style="flex: 1; height: 48px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border-top: 2px solid {{tab.rule}}; margin-top: -2px;">
+        <div style="font-size: 12.5px; font-weight: 500; color: {{tab.color}};">{{tab.name}}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <svg width="0" height="0" style="position: absolute;" aria-hidden="true"><defs>
+    <symbol id="in-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></symbol>
+    <symbol id="in-cloud" viewBox="0 0 24 24"><path d="M7.5 19a4.5 4.5 0 0 1-.4-9 6 6 0 0 1 11.5 1.6A3.9 3.9 0 0 1 17.5 19z"></path></symbol>
+    <symbol id="in-img" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="2.5"></rect><circle cx="9" cy="10" r="1.6"></circle><path d="m4.6 17.6 4.1-4.1a2 2 0 0 1 2.8 0l4.9 4.9"></path></symbol>
+    <symbol id="in-doc" viewBox="0 0 24 24"><path d="M6.5 3.5h7L19 9v10.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 19.5v-14A1.5 1.5 0 0 1 6.5 3.5z"></path><path d="M13.4 3.6V9H19M8.5 13.5h7M8.5 17h5"></path></symbol>
+    <symbol id="in-play" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="4"></rect><path d="M10 8.9 15.6 12 10 15.1z"></path></symbol>
+    <symbol id="in-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"></circle><path d="M3.6 12h16.8M12 3.5c2.3 2.4 3.5 5.3 3.5 8.5S14.3 18.1 12 20.5c-2.3-2.4-3.5-5.3-3.5-8.5S9.7 5.9 12 3.5z"></path></symbol>
+    <symbol id="in-pen" viewBox="0 0 24 24"><path d="m5 19 1.1-4.1L16.6 4.4a2.1 2.1 0 0 1 3 3L9.1 17.9z"></path><path d="m14.6 6.4 3 3"></path></symbol>
+    <symbol id="in-tv" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="12.5" rx="2.5"></rect><path d="M8.5 20.5h7"></path></symbol>
+    <symbol id="in-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2"></rect><rect x="13" y="4" width="7" height="7" rx="2"></rect><rect x="4" y="13" width="7" height="7" rx="2"></rect><rect x="13" y="13" width="7" height="7" rx="2"></rect></symbol>
+    <symbol id="in-list" viewBox="0 0 24 24"><path d="M9 7h10.5M9 12h10.5M9 17h6.5"></path><path d="M4.5 7h.01M4.5 12h.01M4.5 17h.01"></path></symbol>
+    <symbol id="in-chat" viewBox="0 0 24 24"><path d="M20 12.2c0 3.7-3.6 6.7-8 6.7a9.6 9.6 0 0 1-2.6-.35L5 20l1.1-3.2A6.3 6.3 0 0 1 4 12.2C4 8.5 7.6 5.5 12 5.5s8 3 8 6.7z"></path></symbol>
+    <symbol id="in-code" viewBox="0 0 24 24"><path d="m9 8.4-4.2 3.7L9 15.8M15 8.4l4.2 3.7L15 15.8"></path></symbol>
+    <symbol id="in-folder" viewBox="0 0 24 24"><path d="M3.5 6.5a1.5 1.5 0 0 1 1.5-1.5h4l2 2.5h8a1.5 1.5 0 0 1 1.5 1.5v9a1.5 1.5 0 0 1-1.5 1.5H5a1.5 1.5 0 0 1-1.5-1.5z"></path></symbol>
+  </defs></svg>
+
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{"dark":{"editor":"boolean","default":false,"section":"Tema"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const dark = this.props.dark ?? false;
+    const t = dark
+      ? { bg: '#141517', ink: '#EAECEE', ink2: '#9BA3AA', faint: '#6B747B', line: '#232629',
+          rule: '#333940', field: '#1B1D20', chip: '#262A2E', base: '#1B1D20', accent: '#F08A4B' }
+      : { bg: '#FCFCFD', ink: '#1B1D20', ink2: '#4B5158', faint: '#949BA2', line: '#EDEEF0',
+          rule: '#D8DBDE', field: '#FFFFFF', chip: '#F0F1F3', base: '#FFFFFF', accent: '#C2521C' };
+
+    const row = (name, host, icon, c) => ({
+      name, host, icon: '#in-' + icon,
+      bg: 'color-mix(in oklab, ' + c + ' ' + (dark ? 26 : 13) + '%, ' + t.base + ')',
+      glyph: dark ? 'color-mix(in oklab, ' + c + ' 60%, #EAECEE)' : 'color-mix(in oklab, ' + c + ' 86%, #1B1D20)'
+    });
+
+    const sections = [
+      { name: 'DIARIO', count: '8', rows: [
+        row('Calendario', 'calendar.google.com', 'cal', '#2F6FD0'),
+        row('Drive', 'drive.google.com', 'cloud', '#3D8BFD'),
+        row('Fotos', 'photos.google.com', 'img', '#E4572E'),
+        row('Keep', 'keep.google.com', 'doc', '#D9A116'),
+        row('YouTube', 'youtube.com', 'play', '#C4302B'),
+        row('Traductor', 'translate.google.com', 'globe', '#1F7AE0')
+      ]},
+      { name: 'CREAR', count: '9', rows: [
+        row('Figma', 'figma.com', 'pen', '#A259FF'),
+        row('Notion', 'notion.so', 'doc', '#6B6B6B'),
+        row('Linear', 'linear.app', 'list', '#5E6AD2'),
+        row('Trabajo', '6 apps', 'folder', '#7C3E7E')
+      ]}
+    ];
+    const tabs = [
+      { name: 'Diario', color: t.accent, rule: t.accent },
+      { name: 'Crear', color: t.ink2, rule: 'transparent' },
+      { name: 'Ocio', color: t.ink2, rule: 'transparent' }
+    ];
+    return { t, sections, tabs };
+  }
+}
+</script>
+</body>
+</html>
