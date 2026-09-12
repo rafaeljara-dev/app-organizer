@@ -1,0 +1,29 @@
+{
+  "name": "app-organizer",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build && node scripts/build-sw.mjs",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "16.3.5",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@serwist/build": "^9.5.12",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "esbuild": "^0.25.0",
+    "postcss": "^8",
+    "serwist": "^9.5.12",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.9.3"
+  }
+}
