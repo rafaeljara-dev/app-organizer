@@ -1,5 +1,9 @@
 # Estante
 
+**En vivo: https://rafaeljara-dev.github.io/app-organizer/**
+
+Ábrelo en el móvil y añádelo a la pantalla de inicio para usarlo como app.
+
 Un organizador de webapps que se instala como PWA y las agrupa en una pantalla
 de inicio propia: páginas con nombre, carpetas, búsqueda al alcance del pulgar
 y una cuadrícula que puedes ajustar.
