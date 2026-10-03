@@ -18,7 +18,7 @@ export function defaultDoc(): Doc {
     schemaVersion: 1,
     settings: {
       view: "grid", cols: 4, scale: 1, shape: "squircle",
-      labels: "off", wp: "bruma", theme: "system", refract: "on",
+      labels: "on", wp: "musgo", theme: "system", refract: "off",
     },
     dock: [
       app("Gmail", "https://mail.google.com", "mail", "#D14836"),

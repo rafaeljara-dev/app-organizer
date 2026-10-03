@@ -106,6 +106,21 @@ export const UI = {
   </>,
   down: P("M12 4v12M7 11.4l5 5 5-5M4.6 20h14.8"),
   up: P("M12 20V8M7 12.6l5-5 5 5M4.6 4h14.8"),
+  home: <>
+    {P("M3 10.5L12 3l9 7.5v9a1.5 1.5 0 0 1-1.5 1.5H15v-6h-6v6H4.5A1.5 1.5 0 0 1 3 19.5v-9z")}
+  </>,
+  apps: <>
+    <rect x="4" y="4" width="6.5" height="6.5" rx="2" />
+    <rect x="13.5" y="4" width="6.5" height="6.5" rx="2" />
+    <rect x="4" y="13.5" width="6.5" height="6.5" rx="2" />
+    <rect x="13.5" y="13.5" width="6.5" height="6.5" rx="2" />
+  </>,
+  pin: <>
+    {P("M12 21s6.5-6 6.5-10.5a6.5 6.5 0 1 0-13 0C5.5 15 12 21 12 21z")}
+    <circle cx="12" cy="10.5" r="2.4" />
+  </>,
+  check: P("m5 12.6 4.6 4.6L19 7.2"),
+  menu: P("M4 6h16M4 12h16M4 18h16"),
 } as const;
 
 type Common = { className?: string; style?: CSSProperties };

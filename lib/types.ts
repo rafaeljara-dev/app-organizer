@@ -3,6 +3,13 @@ export type GlyphName =
   | "play" | "globe" | "pen" | "tv" | "grid" | "list" | "code" | "music"
   | "film" | "cart" | "bag" | "card" | "check" | "folder";
 
+/** Where a site's own icon was declared. */
+export type IconProvenance =
+  | "manifest"
+  | "apple-touch-icon"
+  | "link-icon"
+  | "favicon.ico";
+
 export type AppItem = {
   id: string;
   type: "app";
@@ -12,8 +19,14 @@ export type AppItem = {
   c: string;
   /** The site's own icon as a data URL, once resolved. */
   icon?: string;
-  /** Which tag it came from; decides whether it fills the tile or sits inside it. */
-  iconSource?: string;
+  /** URL that supplied the icon, kept so it can be refreshed or audited. */
+  iconUrl?: string;
+  /** Which site declaration supplied the icon. */
+  iconSource?: IconProvenance;
+  /** Explicit provenance name used by newer callers. */
+  provenance?: IconProvenance;
+  /** Version of the resolver that last tried this app. */
+  iconVersion?: 1;
   /** Set once we have asked, so a site with no icon is not retried forever. */
   iconTried?: boolean;
 };

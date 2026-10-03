@@ -1,53 +1,32 @@
 "use client";
 
-import type { CSSProperties } from "react";
-import { Glyph } from "@/lib/glyphs";
+import { useState } from "react";
 import { isFolder, type AppItem, type Item } from "@/lib/types";
 
-const cssVar = (name: string, value: string) => ({ [name]: value }) as CSSProperties;
+function SiteImage({ item }: { item: AppItem }) {
+  const [failed, setFailed] = useState<string | undefined>();
+  return item.icon && failed !== item.icon ? (
+    <img src={item.icon} alt="" loading="lazy" decoding="async" draggable={false}
+         onError={() => setFailed(item.icon)} />
+  ) : <span className="icon-placeholder" aria-label="Sin icono del sitio">{item.name[0]?.toUpperCase() || "?"}</span>;
+}
 
+/** Display the site's original image, including ICO files, without redrawing it. */
 export function Ico({ item, className = "" }: { item: Item; className?: string }) {
   if (isFolder(item)) {
-    return (
-      <span className={`ico folder ${className}`}>
-        {item.items.slice(0, 4).map((k) => (
-          <i key={k.id} style={cssVar("--mc", `color-mix(in oklab, ${k.c} var(--gmix), var(--mix))`)} />
-        ))}
-      </span>
-    );
+    return <span className={`ico folder ${className}`}>
+      {item.items.slice(0, 4).map((child) => <i key={child.id} className="folder-cell"><SiteImage item={child} /></i>)}
+    </span>;
   }
-  if (item.icon) {
-    // Only a manifest or apple-touch icon is designed to fill a square.
-    const bleed = item.iconSource === "manifest" || item.iconSource === "apple-touch-icon";
-    return (
-      <span className={`ico ${bleed ? "ico--bleed" : "ico--inset"} ${className}`}
-            style={cssVar("--c", item.c)}>
-        <img src={item.icon} alt="" loading="lazy" decoding="async" />
-      </span>
-    );
-  }
-  return (
-    <span className={`ico ${className}`} style={cssVar("--c", item.c)}>
-      <Glyph name={item.g} />
-    </span>
-  );
+  return <span className={`ico ico--inset ${className}`}><SiteImage item={item} /></span>;
 }
 
 export function hostOf(url: string) {
-  try {
-    return new URL(url).hostname.replace(/^www\./, "");
-  } catch {
-    return url;
-  }
+  try { return new URL(url).hostname.replace(/^www\./, ""); } catch { return url; }
 }
 
-export function Row({ item, onOpen }: { item: AppItem; onOpen: () => void }) {
-  return (
-    <a className="row" href={item.url} target="_blank" rel="noopener noreferrer"
-       onClick={(e) => { e.preventDefault(); onOpen(); }}>
-      <Ico item={item} />
-      <span className="nm">{item.name}</span>
-      <span className="hs">{hostOf(item.url)}</span>
-    </a>
-  );
+export function Row({ item, onOpen }: { item: AppItem; onOpen?: () => void }) {
+  return <a className="row" href={item.url} target="_blank" rel="noopener noreferrer" onClick={onOpen}>
+    <Ico item={item} /><span className="nm">{item.name}</span><span className="hs">{hostOf(item.url)}</span>
+  </a>;
 }

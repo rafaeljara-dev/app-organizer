@@ -9,6 +9,7 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "test:icons": "node scripts/test-icons.mjs",
+    "test:interaction": "node scripts/test-interactions.mjs",
     "test:ui": "PORT_UNDER_TEST=3390 node scripts/e2e-icons.mjs",
     "test:sw": "PORT_UNDER_TEST=3391 node scripts/sw-check.mjs"
   },

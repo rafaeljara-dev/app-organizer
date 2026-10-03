@@ -1,436 +1,194 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { CATALOG, SWATCHES } from "@/lib/catalog";
-import { fetchIcon, hydrateIcons, type Progress, type Resolved } from "@/lib/icon-client";
+import { useEffect, useRef, useState, type ReactNode, type FormEvent } from "react";
 import { app, uid } from "@/lib/defaults";
-import { Glyph, Icon } from "@/lib/glyphs";
-import { exportJson, importJson, resetDoc, setSetting, update } from "@/lib/store";
-import { isFolder, type AppItem, type Doc, type Item, type Settings } from "@/lib/types";
+import { fetchIcon, hydrateIcons, type Resolved } from "@/lib/icon-client";
+import { exportJson, importJson, setSetting, update, getDoc } from "@/lib/store";
+import { isFolder, type AppItem, type Doc, type Item } from "@/lib/types";
+import { Icon } from "@/lib/glyphs";
 import { Ico, hostOf } from "./Tile";
 
-function Seg<T extends string | number | boolean>({
-  value, options, onPick,
-}: { value: T; options: { v: T; label: string }[]; onPick: (v: T) => void }) {
-  return (
-    <div className="seg">
-      {options.map((o) => (
-        <button key={String(o.v)} type="button" aria-pressed={o.v === value}
-                onClick={() => onPick(o.v)}>{o.label}</button>
-      ))}
-    </div>
-  );
-}
-
-function Shell({ open, onClose, children, label }: {
-  open: boolean; onClose: () => void; children: React.ReactNode; label: string;
+export function SheetDialog({ open, onClose, children, label }: {
+  open: boolean; onClose: () => void; children: ReactNode; label: string;
 }) {
-  return (
-    <div className="sheet glass glass-solid" data-open={open} role="dialog" aria-modal="true" aria-label={label}
-         aria-hidden={!open}>
-      <div className="glass-refract" />
-      <div className="glass-body">
-        <button className="grab" onClick={onClose} aria-label="Cerrar" />
-        {children}
-      </div>
-    </div>
-  );
+  const ref = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const dialog = ref.current;
+    if (!dialog) return;
+    if (open && !dialog.open) dialog.showModal();
+    if (!open && dialog.open) dialog.close();
+  }, [open]);
+  return <dialog ref={ref} className="sheet" aria-label={label}
+    onCancel={(e) => { e.preventDefault(); onClose(); }}
+    onClick={(e) => {
+      if (e.target !== e.currentTarget) return;
+      const r = e.currentTarget.getBoundingClientRect();
+      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) onClose();
+    }}>
+    <button className="sheet-close m3-icon-btn" type="button" onClick={onClose} aria-label="Cerrar"><Icon name="x" /></button>
+    {children}
+  </dialog>;
 }
-
-const WPS: { v: Settings["wp"]; a: string; b: string }[] = [
-  { v: "bruma", a: "#BFDCDE", b: "#123840" },
-  { v: "arena", a: "#E6CFAC", b: "#3D2C14" },
-  { v: "musgo", a: "#C2D9BB", b: "#163220" },
-  { v: "oxido", a: "#E6C4B2", b: "#3E2017" },
-  { v: "tinta", a: "#DFE1E3", b: "#1A1D20" },
-];
 
 export function SettingsSheet({ open, onClose, doc, onOrganise, onToast }: {
-  open: boolean; onClose: () => void; doc: Doc; onOrganise: () => void; onToast: (m: string) => void;
+  open: boolean; onClose: () => void; doc: Doc; onOrganise: () => void; onToast: (message: string) => void;
 }) {
   const [json, setJson] = useState("");
-  const [prog, setProg] = useState<Progress | null>(null);
   const [busy, setBusy] = useState(false);
-  const s = doc.settings;
-
-  return (
-    <Shell open={open} onClose={onClose} label="Ajustes">
-      <h2>Ajustes</h2>
-      <p className="sub">Todo vive en este dispositivo. Nada se envía a ningún servidor.</p>
-
-      <div className="grp">
-        <h3>Disposición</h3>
-        <div className="line">
-          <span className="k">Vista<small>Cuadrícula de iconos o lista por nombre</small></span>
-          <Seg value={s.view} onPick={(v) => setSetting("view", v)}
-               options={[{ v: "grid" as const, label: "Cuadrícula" }, { v: "list" as const, label: "Lista" }]} />
-        </div>
-        <div className="line">
-          <span className="k">Columnas</span>
-          <Seg value={s.cols} onPick={(v) => setSetting("cols", v)}
-               options={[{ v: 3 as const, label: "3" }, { v: 4 as const, label: "4" }, { v: 5 as const, label: "5" }, { v: 6 as const, label: "6" }]} />
-        </div>
-        <div className="line">
-          <span className="k">Tamaño</span>
-          <Seg value={s.scale} onPick={(v) => setSetting("scale", v)}
-               options={[{ v: 0.85, label: "S" }, { v: 1, label: "M" }, { v: 1.15, label: "L" }]} />
-        </div>
-        <div className="line">
-          <span className="k">Etiquetas<small>Nombre bajo cada icono</small></span>
-          <Seg value={s.labels} onPick={(v) => setSetting("labels", v)}
-               options={[{ v: "off" as const, label: "No" }, { v: "on" as const, label: "Sí" }]} />
-        </div>
+  const [confirmImport, setConfirmImport] = useState(false);
+  return <SheetDialog open={open} onClose={onClose} label="Ajustes">
+    <h2>Ajustes</h2><p className="sub">Tus enlaces se guardan en este dispositivo.</p>
+    <div className="grp"><h3>Vista</h3><div className="seg">
+      {(["grid", "list"] as const).map((view) => <button key={view} aria-pressed={doc.settings.view === view}
+        onClick={() => setSetting("view", view)}>{view === "grid" ? "Iconos" : "Lista"}</button>)}
+    </div></div>
+    <div className="grp"><h3>Tema</h3><div className="seg">
+      {(["system", "light", "dark"] as const).map((theme, i) => <button key={theme} aria-pressed={doc.settings.theme === theme}
+        onClick={() => setSetting("theme", theme)}>{["Sistema", "Claro", "Oscuro"][i]}</button>)}
+    </div></div>
+    <button className="btn ghost" onClick={() => { onOrganise(); onClose(); }}>Organizar accesos</button>
+    <details className="grp advanced"><summary>Copia de seguridad e iconos</summary>
+      <p className="hint">Exporta tus enlaces para guardarlos o llevarlos a otro dispositivo.</p>
+      <div className="btns">
+        <button className="btn ghost" onClick={() => {
+          const text = exportJson(); setJson(text);
+          void navigator.clipboard?.writeText(text).then(() => onToast("Copia guardada en el portapapeles"), () => onToast("Copia lista abajo"));
+        }}>Exportar</button>
+        <button className="btn ghost" disabled={!json.trim()} onClick={() => setConfirmImport(true)}>Importar</button>
       </div>
-
-      <div className="grp">
-        <h3>Apariencia</h3>
-        <div className="line">
-          <span className="k">Forma del icono</span>
-          <Seg value={s.shape} onPick={(v) => setSetting("shape", v)}
-               options={[{ v: "squircle" as const, label: "Squircle" }, { v: "circulo" as const, label: "Círculo" }, { v: "suave" as const, label: "Suave" }, { v: "recto" as const, label: "Recto" }]} />
-        </div>
-        <div className="line">
-          <span className="k">Tema</span>
-          <Seg value={s.theme} onPick={(v) => setSetting("theme", v)}
-               options={[{ v: "system" as const, label: "Sistema" }, { v: "light" as const, label: "Claro" }, { v: "dark" as const, label: "Oscuro" }]} />
-        </div>
-        <div className="line">
-          <span className="k">Refracción<small>El borde de cristal dobla el fondo. Sólo en navegadores Chromium.</small></span>
-          <Seg value={s.refract} onPick={(v) => setSetting("refract", v)}
-               options={[{ v: "on" as const, label: "Sí" }, { v: "off" as const, label: "No" }]} />
-        </div>
-        <div style={{ paddingTop: 12 }}>
-          <div className="wps">
-            {WPS.map((w) => (
-              <button key={w.v} className="wp" aria-pressed={s.wp === w.v} aria-label={`Fondo ${w.v}`}
-                      onClick={() => setSetting("wp", w.v)}>
-                <span style={{ background: `linear-gradient(150deg, ${w.a}, ${w.b})` }} />
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="grp">
-        <h3>Iconos</h3>
-        <p className="hint" style={{ margin: "0 0 12px" }}>
-          Cada sitio publica su propio icono. Estante lo lee de su manifiesto, o de
-          las etiquetas antiguas si no tiene, y lo guarda aquí para que siga estando
-          sin conexión.
-        </p>
-        <div className="btns">
-          <button className="btn ghost" disabled={busy} onClick={async () => {
-            setBusy(true);
-            const r = await hydrateIcons(doc, setProg);
-            setBusy(false);
-            onToast(r.total === 0 ? "Ya están todos" : `${r.ok} de ${r.total} resueltos`);
-          }}>
-            <Icon name="down" style={{ width: 16, height: 16, verticalAlign: -3, marginRight: 7 }} />
-            Traer los que falten
-          </button>
-          <button className="btn ghost" disabled={busy} onClick={async () => {
-            setBusy(true);
-            const r = await hydrateIcons(doc, setProg, { force: true });
-            setBusy(false);
-            onToast(`${r.ok} de ${r.total} resueltos`);
-          }}>
-            Volver a buscar todos
-          </button>
-        </div>
-        {prog && prog.total > 0 && (
-          <>
-            <div className="bar"><i style={{ width: `${Math.round((prog.done / prog.total) * 100)}%` }} /></div>
-            <p className="hint">{prog.done} de {prog.total}, {prog.ok} con icono propio</p>
-          </>
-        )}
-      </div>
-
-      <div className="grp">
-        <h3>Organizar</h3>
-        <div className="btns">
-          <button className="btn ghost" onClick={() => { onOrganise(); onClose(); }}>
-            <Icon name="move" style={{ width: 16, height: 16, verticalAlign: -3, marginRight: 7 }} />
-            Reordenar iconos
-          </button>
-          <button className="btn ghost" onClick={() => {
-            update((d) => { d.pages.push({ id: uid(), name: `Página ${d.pages.length + 1}`, items: [] }); });
-            onToast("Página añadida");
-          }}>
-            <Icon name="plus" style={{ width: 16, height: 16, verticalAlign: -3, marginRight: 7 }} />
-            Añadir página
-          </button>
-        </div>
-      </div>
-
-      <div className="grp">
-        <h3>Tus datos</h3>
-        <div className="btns" style={{ marginBottom: 12 }}>
-          <button className="btn ghost" onClick={() => {
-            const text = exportJson();
-            setJson(text);
-            navigator.clipboard?.writeText(text).then(
-              () => onToast("Respaldo copiado"),
-              () => onToast("Respaldo listo abajo"),
-            );
-          }}>
-            <Icon name="down" style={{ width: 16, height: 16, verticalAlign: -3, marginRight: 7 }} />
-            Exportar
-          </button>
-          <button className="btn ghost" onClick={() => {
-            onToast(importJson(json) ? "Respaldo importado" : "Ese respaldo no se pudo leer");
-          }}>
-            <Icon name="up" style={{ width: 16, height: 16, verticalAlign: -3, marginRight: 7 }} />
-            Importar
-          </button>
-          <button className="btn danger" onClick={() => { resetDoc(); onToast("Estante restablecido"); }}>
-            Restablecer
-          </button>
-        </div>
-        <textarea className="field" value={json} onChange={(e) => setJson(e.target.value)}
-                  spellCheck={false} placeholder="El respaldo aparece aquí. Pega uno y pulsa Importar." />
-        <p className="hint">Guarda este texto en un archivo. Lleva todo salvo las imágenes de los iconos, que se vuelven a pedir solas al importar.</p>
-      </div>
-    </Shell>
-  );
+      {confirmImport && <div className="confirm-box"><p>La copia reemplazará tus enlaces actuales.</p><div className="btns">
+        <button className="btn" onClick={() => { const ok = importJson(json); setConfirmImport(false); const imported = getDoc(); if (ok && imported) void hydrateIcons(imported); onToast(ok ? "Copia importada" : "No se pudo leer esa copia"); }}>Reemplazar enlaces</button>
+        <button className="btn ghost" onClick={() => setConfirmImport(false)}>Cancelar</button>
+      </div></div>}
+      <textarea className="field" value={json} onChange={(e) => setJson(e.target.value)} aria-label="Copia de seguridad" spellCheck={false} placeholder="Pega aquí una copia para importarla" />
+      <button className="btn ghost" disabled={busy} onClick={async () => {
+        setBusy(true);
+        try { const result = await hydrateIcons(doc, undefined, { force: true }); onToast(`${result.ok} de ${result.total} iconos actualizados`); }
+        finally { setBusy(false); }
+      }}>{busy ? "Buscando iconos…" : "Actualizar iconos de los sitios"}</button>
+    </details>
+  </SheetDialog>;
 }
 
-function normUrl(raw: string) {
-  const v = raw.trim();
-  if (!v) return "";
-  const withScheme = /^https?:\/\//i.test(v) ? v : `https://${v}`;
+function normUrl(raw: string): string {
+  const value = raw.trim();
+  if (!value) return "";
   try {
-    new URL(withScheme);
-    return withScheme;
-  } catch {
-    return "";
-  }
+    const url = new URL(/^[a-z][a-z\d+.-]*:/i.test(value) ? value : `https://${value}`);
+    if (!/^https?:$/.test(url.protocol) || !url.hostname.includes(".") || url.username || url.password) return "";
+    return url.href;
+  } catch { return ""; }
 }
 
 export function AddSheet({ open, onClose, doc, page, onToast }: {
-  open: boolean; onClose: () => void; doc: Doc; page: number; onToast: (m: string) => void;
+  open: boolean; onClose: () => void; doc: Doc; page: number; onToast: (message: string) => void;
 }) {
   const [url, setUrl] = useState("");
-  const [picked, setPicked] = useState<number[]>([]);
-  const [dest, setDest] = useState(page);
-  const [peek, setPeek] = useState<Resolved | null>(null);
+  const [name, setName] = useState("");
+  const [dest, setDest] = useState("");
+  const [peek, setPeek] = useState<{ url: string; result: Resolved } | null>(null);
   const [looking, setLooking] = useState(false);
-  const trip = useRef(0);
-
-  // Resolve as they type, but only once they have stopped.
+  const [error, setError] = useState("");
+  const initialDestination = doc.pages[page]?.id ?? doc.pages[0]?.id ?? "";
+  useEffect(() => { if (open) { setDest(initialDestination); setError(""); } }, [open, initialDestination]);
   useEffect(() => {
+    setPeek(null);
     const candidate = normUrl(url);
-    if (!candidate) { setPeek(null); setLooking(false); return; }
-    const mine = ++trip.current;
+    if (!open || !candidate) { setLooking(false); return; }
+    const ctrl = new AbortController();
     setLooking(true);
     const timer = setTimeout(async () => {
-      const r = await fetchIcon(candidate);
-      if (trip.current !== mine) return;
-      setPeek(r);
-      setLooking(false);
-    }, 650);
-    return () => clearTimeout(timer);
-  }, [url]);
-
-  const commit = () => {
-    const target = doc.pages[dest] ? dest : 0;
-    let added = 0;
-    const made: AppItem[] = [];
-    const u = normUrl(url);
-    if (u) {
-      const h = hostOf(u);
-      const fallbackName = h.split(".")[0].replace(/^./, (c) => c.toUpperCase());
-      const colour = peek?.ok && /^#[0-9a-f]{6}$/i.test(peek.themeColor ?? "")
-        ? (peek.themeColor as string)
-        : SWATCHES[Math.floor(Math.random() * SWATCHES.length)];
-      const fresh = app(peek?.ok ? peek.name || fallbackName : fallbackName, u, "globe", colour);
-      if (peek?.ok) { fresh.icon = peek.icon; fresh.iconSource = peek.source; fresh.iconTried = true; }
-      made.push(fresh);
-      added++;
-    }
-    for (const i of picked) {
-      const e = CATALOG[i];
-      made.push(app(e.name, e.url, e.g, e.c));
-      added++;
-    }
-    if (!added) { onToast("Elige algo primero"); return; }
-    update((d) => { d.pages[target].items.push(...made); });
-    setUrl(""); setPicked([]);
-    onToast(`${added} ${added === 1 ? "app añadida" : "apps añadidas"} a ${doc.pages[target].name}`);
-    onClose();
+      const result = await fetchIcon(candidate, ctrl.signal);
+      if (ctrl.signal.aborted) return;
+      setPeek({ url: candidate, result }); setLooking(false);
+    }, 450);
+    return () => { clearTimeout(timer); ctrl.abort(); };
+  }, [url, open]);
+  const commit = (event: FormEvent) => {
+    event.preventDefault();
+    const address = normUrl(url);
+    if (!address) { setError("Escribe una dirección web válida (http o https)."); return; }
+    const resolved = peek?.url === address && peek.result.ok ? peek.result : null;
+    const fresh = app(name.trim() || resolved?.name || hostOf(address), address, "globe", "#737970");
+    if (resolved) Object.assign(fresh, { icon: resolved.icon, iconSource: resolved.source, iconUrl: resolved.iconUrl, iconVersion: 1, iconTried: true });
+    update((draft) => {
+      const collection = draft.pages.find((p) => p.id === dest) ?? draft.pages[0];
+      if (collection) collection.items.push(fresh);
+      else draft.pages.push({ id: uid(), name: "Mis enlaces", items: [fresh] });
+    });
+    void hydrateIcons({ ...doc, dock: [], pages: [{ id: dest, name: "", items: [fresh] }] });
+    setUrl(""); setName(""); setPeek(null); onClose(); onToast("Enlace añadido");
   };
-
-  return (
-    <Shell open={open} onClose={onClose} label="Añadir app">
-      <h2>Añadir al estante</h2>
-      <p className="sub">Pega una dirección o elige del catálogo.</p>
-
-      <div className="grp">
-        <h3>Dirección</h3>
-        <input className="field" value={url} onChange={(e) => setUrl(e.target.value)}
-               placeholder="figma.com" inputMode="url" aria-label="Dirección" autoComplete="off" />
-        {looking && <p className="hint">Leyendo el sitio…</p>}
-        {!looking && peek?.ok && (
-          <div className="iconrow">
-            <Ico item={{ id: "peek", type: "app", name: peek.name, url: normUrl(url),
-                         g: "globe", c: peek.themeColor ?? "#0E7C74",
-                         icon: peek.icon, iconSource: peek.source }} />
-            <div className="m">
-              <b>{peek.name}</b>
-              <span>{peek.host} · icono desde {peek.source}</span>
-            </div>
-          </div>
-        )}
-        {!looking && peek && !peek.ok && (
-          <p className="hint">Ese sitio no publica un icono utilizable. Se añadirá con un glifo.</p>
-        )}
-      </div>
-
-      <div className="grp">
-        <h3>Catálogo</h3>
-        <div className="cat">
-          {CATALOG.map((e, i) => {
-            const on = picked.includes(i);
-            return (
-              <button key={e.url} className="catit" type="button" aria-pressed={on}
-                      onClick={() => setPicked((p) => (on ? p.filter((x) => x !== i) : [...p, i]))}>
-                <span className="ico" style={{ ["--c" as string]: e.c } as React.CSSProperties}>
-                  <Glyph name={e.g} />
-                </span>
-                <span className="lbl">{e.name}</span>
-                <span className="tick"><Glyph name="check" /></span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="grp">
-        <h3>Destino</h3>
-        <select className="field" value={dest} onChange={(e) => setDest(Number(e.target.value))}>
-          {doc.pages.map((p, i) => <option key={p.id} value={i}>{p.name}</option>)}
-        </select>
-      </div>
-
-      <div className="btns">
-        <button className="btn" onClick={commit}>Añadir</button>
-        <button className="btn ghost" onClick={onClose}>Cancelar</button>
-      </div>
-    </Shell>
-  );
+  return <SheetDialog open={open} onClose={onClose} label="Añadir enlace"><h2>Añadir enlace</h2>
+    <p className="sub">Guarda un sitio que uses a menudo.</p>
+    <form onSubmit={commit}>
+      <label className="form-label">Dirección<input className="field" value={url} onChange={(e) => { setUrl(e.target.value); setError(""); }} placeholder="ejemplo.com" inputMode="url" autoComplete="url" autoCapitalize="none" spellCheck={false} required /></label>
+      {error && <p className="hint error" role="alert">{error}</p>}
+      {looking && <p className="hint" role="status">Buscando el icono del sitio…</p>}
+      {!looking && peek?.result.ok && <div className="iconrow"><Ico item={{ id: "preview", type: "app", name: peek.result.name, url: peek.url, g: "globe", c: "", icon: peek.result.icon }} /><span>{peek.result.name || hostOf(peek.url)}</span></div>}
+      {!looking && peek && !peek.result.ok && <p className="hint">Sin icono disponible. Puedes guardar el enlace igualmente.</p>}
+      <label className="form-label">Nombre <small>(opcional)</small><input className="field" value={name} onChange={(e) => setName(e.target.value)} placeholder={peek?.result.ok ? peek.result.name : "Nombre del sitio"} /></label>
+      <label className="form-label">Colección<select className="field" value={dest} onChange={(e) => setDest(e.target.value)}>{doc.pages.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
+      <div className="btns"><button className="btn" type="submit">Guardar enlace</button><button className="btn ghost" type="button" onClick={onClose}>Cancelar</button></div>
+    </form>
+  </SheetDialog>;
 }
 
-export function EditSheet({ open, onClose, doc, item, onToast, onRemove }: {
-  open: boolean; onClose: () => void; doc: Doc; item: Item | null;
-  onToast: (m: string) => void; onRemove: (id: string) => void;
-}) {
-  const [draft, setDraft] = useState<{ id: string; name: string; url: string; c: string; page: number } | null>(null);
-
-  const home = useMemo(() => {
-    if (!item) return 0;
-    const i = doc.pages.findIndex((p) => p.items.some((x) => x.id === item.id));
-    return i < 0 ? 0 : i;
-  }, [doc, item]);
-
-  if (item && (!draft || draft.id !== item.id)) {
-    setDraft({
-      id: item.id,
-      name: item.name,
-      url: isFolder(item) ? "" : item.url,
-      c: isFolder(item) ? "" : item.c,
-      page: home,
-    });
+function locationOf(doc: Doc, id: string) {
+  if (doc.dock.some((item) => item.id === id)) return "dock";
+  for (const page of doc.pages) {
+    if (page.items.some((item) => item.id === id)) return page.id;
+    for (const item of page.items) if (isFolder(item) && item.items.some((child) => child.id === id)) return item.id;
   }
-  if (!item || !draft) return <Shell open={false} onClose={onClose} label="Editar"><div /></Shell>;
+  return doc.pages[0]?.id ?? "";
+}
 
-  const folder = isFolder(item);
+export function EditSheet(props: { open: boolean; onClose: () => void; doc: Doc; item: Item | null; onToast: (message: string) => void; onRemove: (id: string) => void }) {
+  return <SheetDialog open={props.open && !!props.item} onClose={props.onClose} label="Editar enlace">
+    {props.open && props.item && <EditForm key={props.item.id} {...props} item={props.item} />}
+  </SheetDialog>;
+}
 
-  const save = () => {
-    update((d) => {
-      for (const p of d.pages) {
-        const hit = p.items.find((x) => x.id === draft.id);
-        if (hit) {
-          hit.name = draft.name.trim() || hit.name;
-          if (hit.type === "app") {
-            hit.url = normUrl(draft.url) || hit.url;
-            hit.c = draft.c;
-          }
-          const to = d.pages[draft.page];
-          if (to && to !== p) {
-            p.items.splice(p.items.indexOf(hit), 1);
-            to.items.push(hit);
-          }
-          return;
-        }
-        for (const f of p.items) {
-          if (f.type !== "folder") continue;
-          const inner = f.items.find((x) => x.id === draft.id);
-          if (inner) {
-            inner.name = draft.name.trim() || inner.name;
-            inner.url = normUrl(draft.url) || inner.url;
-            inner.c = draft.c;
-            return;
-          }
-        }
+function EditForm({ doc, item, onClose, onToast }: { doc: Doc; item: Item; onClose: () => void; onToast: (message: string) => void }) {
+  const [name, setName] = useState(item.name);
+  const [url, setUrl] = useState(isFolder(item) ? "" : item.url);
+  const [dest, setDest] = useState(locationOf(doc, item.id));
+  const [error, setError] = useState("");
+  const save = (event: FormEvent) => {
+    event.preventDefault();
+    const address = isFolder(item) ? "" : normUrl(url);
+    if (!isFolder(item) && !address) { setError("Escribe una dirección web válida."); return; }
+    let refreshed: AppItem | undefined;
+    update((draft) => {
+      const lists: Item[][] = [draft.dock, ...draft.pages.flatMap((p) => [p.items, ...p.items.filter(isFolder).map((f) => f.items)])];
+      const source = lists.find((list) => list.some((entry) => entry.id === item.id));
+      const hit = source?.find((entry) => entry.id === item.id);
+      if (!hit || !source) return;
+      hit.name = name.trim() || hit.name;
+      if (!isFolder(hit) && hit.url !== address) {
+        hit.url = address; delete hit.icon; delete hit.iconSource; delete hit.iconUrl; delete hit.provenance; delete hit.iconVersion; delete hit.iconTried;
+        refreshed = { ...hit };
       }
-      const d0 = d.dock.find((x) => x.id === draft.id);
-      if (d0) {
-        d0.name = draft.name.trim() || d0.name;
-        d0.url = normUrl(draft.url) || d0.url;
-        d0.c = draft.c;
+      const destinationFolder = draft.pages.flatMap((p) => p.items).find((entry) => entry.id === dest && isFolder(entry));
+      const destination = dest === "dock" ? draft.dock : draft.pages.find((p) => p.id === dest)?.items ?? (destinationFolder && isFolder(destinationFolder) ? destinationFolder.items : undefined);
+      if (destination && destination !== source && !(isFolder(hit) && dest === "dock")) {
+        source.splice(source.indexOf(hit), 1); (destination as Item[]).push(hit);
       }
     });
-    onToast("Guardado");
-    onClose();
+    if (refreshed) void hydrateIcons({ ...doc, dock: [refreshed], pages: [] });
+    onClose(); onToast("Enlace guardado");
   };
-
-  return (
-    <Shell open={open} onClose={onClose} label="Editar app">
-      <h2>{folder ? "Carpeta" : "Editar"}</h2>
-      <p className="sub">{folder ? `${item.items.length} apps dentro` : hostOf(item.url)}</p>
-
-      <div className="grp">
-        <h3>Nombre</h3>
-        <input className="field" value={draft.name}
-               onChange={(e) => setDraft({ ...draft, name: e.target.value })} aria-label="Nombre" />
-      </div>
-
-      {!folder && (
-        <>
-          <div className="grp">
-            <h3>Dirección</h3>
-            <input className="field" value={draft.url} inputMode="url"
-                   onChange={(e) => setDraft({ ...draft, url: e.target.value })} aria-label="Dirección" />
-          </div>
-          <div className="grp">
-            <h3>Color</h3>
-            <div className="sw">
-              {SWATCHES.map((c) => (
-                <button key={c} aria-pressed={c.toLowerCase() === draft.c.toLowerCase()}
-                        aria-label={`Color ${c}`} style={{ background: c }}
-                        onClick={() => setDraft({ ...draft, c })} />
-              ))}
-            </div>
-          </div>
-        </>
-      )}
-
-      <div className="grp">
-        <h3>Página</h3>
-        <select className="field" value={draft.page}
-                onChange={(e) => setDraft({ ...draft, page: Number(e.target.value) })}>
-          {doc.pages.map((p, i) => <option key={p.id} value={i}>{p.name}</option>)}
-        </select>
-      </div>
-
-      <div className="btns">
-        <button className="btn" onClick={save}>Guardar</button>
-        <button className="btn ghost" onClick={onClose}>Cancelar</button>
-        <button className="btn danger" onClick={() => { onRemove(item.id); onClose(); }}>Quitar</button>
-      </div>
-    </Shell>
-  );
+  return <form onSubmit={save}><h2>{isFolder(item) ? "Editar carpeta" : "Editar enlace"}</h2>
+    <label className="form-label">Nombre<input className="field" value={name} onChange={(e) => setName(e.target.value)} required /></label>
+    {!isFolder(item) && <label className="form-label">Dirección<input className="field" value={url} onChange={(e) => setUrl(e.target.value)} inputMode="url" autoCapitalize="none" spellCheck={false} required /></label>}
+    {error && <p className="hint error" role="alert">{error}</p>}
+    <label className="form-label">Ubicación<select className="field" value={dest} onChange={(e) => setDest(e.target.value)}>
+      {!isFolder(item) && <option value="dock">Fijadas</option>}
+      {doc.pages.map((page) => <option key={page.id} value={page.id}>{page.name}</option>)}
+      {!isFolder(item) && doc.pages.flatMap((page) => page.items.filter(isFolder).map((folder) => <option key={folder.id} value={folder.id}>{page.name} · {folder.name}</option>))}
+    </select></label>
+    <div className="btns"><button className="btn" type="submit">Guardar</button><button className="btn ghost" type="button" onClick={onClose}>Cancelar</button></div>
+  </form>;
 }
 
-export function Ghost({ item }: { item: Item }) {
-  return <Ico item={item} />;
-}
+export function Ghost({ item }: { item: Item }) { return <Ico item={item} />; }

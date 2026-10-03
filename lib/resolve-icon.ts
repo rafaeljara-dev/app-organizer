@@ -1,20 +1,14 @@
 /**
- * Work out a site's real icon from nothing but its address.
+ * Resolve the icon a site publishes for itself.
  *
- * The order matters. A web app manifest is authoritative: the site itself
- * says which image represents it, at which size, plus its name and colour.
- * Only when there is no manifest do we fall back through the older tags,
- * and `/favicon.ico` is the last resort because it is usually 16 pixels of
- * mud. og:image is a social banner, not an icon, so it ranks below all of
- * them but above giving up.
+ * The order is deliberately limited to browser icon sources: the web app
+ * manifest, apple-touch-icon, link rel=icon and finally /favicon.ico.
+ * Social images are banners and are never used as launcher icons.
  */
 
-export type IconSource =
-  | "manifest"
-  | "apple-touch-icon"
-  | "link-icon"
-  | "og-image"
-  | "favicon.ico";
+import type { IconProvenance } from "./types";
+
+export type IconSource = IconProvenance;
 
 export type IconHit = {
   ok: true;
@@ -24,6 +18,8 @@ export type IconHit = {
   icon: string;
   iconUrl: string;
   source: IconSource;
+  provenance: IconSource;
+  iconVersion: 1;
   bytes: number;
   contentType: string;
 };
@@ -45,6 +41,8 @@ export type ResolveOptions = {
 const HTML_LIMIT = 512 * 1024;
 const ICON_LIMIT = 400 * 1024;
 const TIMEOUT = 7000;
+const RESOLUTION_DEADLINE = 12000;
+const MAX_REDIRECTS = 5;
 const UA = "Mozilla/5.0 (compatible; EstanteIconBot/1.0; +https://github.com/rafaeljara-dev/app-organizer)";
 
 /* ---------------- parsing ---------------- */
@@ -117,7 +115,6 @@ export function readHead(html: string, base: string) {
     links,
     manifest: links.find((l) => l.rel.split(/\s+/).includes("manifest"))?.href ?? "",
     themeColor: meta("theme-color") || null,
-    ogImage: abs(meta("og:image") || meta("og:image:secure_url")),
     siteName: meta("og:site_name") || meta("application-name") || meta("apple-mobile-web-app-title"),
     title,
   };
@@ -134,7 +131,6 @@ export function candidatesFromHead(head: ReturnType<typeof readHead>): Candidate
       out.push({ url: l.href, source: "link-icon", score: 62 + sizeScore(edge) + typeScore(l.href, l.type) });
     }
   }
-  if (head.ogImage) out.push({ url: head.ogImage, source: "og-image", score: 25 });
   return out;
 }
 
@@ -174,25 +170,169 @@ export function manifestThemeColor(json: unknown): string | null {
 /* ---------------- image sniffing ---------------- */
 
 export function sniffImage(bytes: Uint8Array, declared: string): string | null {
-  const d = (declared || "").split(";")[0].trim().toLowerCase();
   const b = bytes;
   if (b.length >= 8 && b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47) return "image/png";
   if (b.length >= 3 && b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff) return "image/jpeg";
   if (b.length >= 6 && b[0] === 0x47 && b[1] === 0x49 && b[2] === 0x46) return "image/gif";
   if (b.length >= 12 && b[8] === 0x57 && b[9] === 0x45 && b[10] === 0x42 && b[11] === 0x50) return "image/webp";
   if (b.length >= 4 && b[0] === 0x00 && b[1] === 0x00 && b[2] === 0x01 && b[3] === 0x00) return "image/x-icon";
-  const head = new TextDecoder().decode(b.slice(0, 300)).trimStart().toLowerCase();
+  const head = new TextDecoder().decode(b.slice(0, 512)).trimStart().toLowerCase();
   if (head.startsWith("<svg") || (head.startsWith("<?xml") && head.includes("<svg"))) return "image/svg+xml";
-  // Some CDNs serve a correct type with bytes we do not recognise.
-  if (d.startsWith("image/")) return d;
+  // Do not trust an image content type when the bytes are not an image. This
+  // keeps an HTML error page from being persisted as an icon.
+  void declared;
   return null;
 }
 
 /* ---------------- fetching ---------------- */
 
-async function readCapped(res: Response, limit: number): Promise<Uint8Array> {
-  const buf = new Uint8Array(await res.arrayBuffer());
-  return buf.length > limit ? buf.slice(0, limit) : buf;
+type Loaded = { response: Response; url: string; bytes: Uint8Array };
+
+function redirectStatus(status: number) {
+  return status === 301 || status === 302 || status === 303 || status === 307 || status === 308;
+}
+
+async function readCapped(res: Response, limit: number, signal: AbortSignal): Promise<Uint8Array> {
+  const contentLength = Number(res.headers.get("content-length") ?? "");
+  if (Number.isFinite(contentLength) && contentLength > limit) {
+    throw new Error("respuesta demasiado grande");
+  }
+
+  if (!res.body) {
+    if (signal.aborted) throw new Error("tiempo agotado");
+    const bytes = new Uint8Array(await new Promise<ArrayBuffer>((resolve, reject) => {
+      const abort = () => reject(new Error("tiempo agotado"));
+      signal.addEventListener("abort", abort, { once: true });
+      res.arrayBuffer().then(
+        (value) => {
+          signal.removeEventListener("abort", abort);
+          resolve(value);
+        },
+        (error) => {
+          signal.removeEventListener("abort", abort);
+          reject(error);
+        },
+      );
+    }));
+    if (bytes.length > limit) throw new Error("respuesta demasiado grande");
+    return bytes;
+  }
+
+  const reader = res.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  try {
+    for (;;) {
+      if (signal.aborted) throw new Error("tiempo agotado");
+      const part = await new Promise<ReadableStreamReadResult<Uint8Array>>((resolve, reject) => {
+        const abort = () => reject(new Error("tiempo agotado"));
+        signal.addEventListener("abort", abort, { once: true });
+        reader.read().then(
+          (value) => {
+            signal.removeEventListener("abort", abort);
+            resolve(value);
+          },
+          (error) => {
+            signal.removeEventListener("abort", abort);
+            reject(error);
+          },
+        );
+      });
+      if (part.done) break;
+      const chunk = part.value;
+      total += chunk.byteLength;
+      if (total > limit) {
+        try { await reader.cancel(); } catch { /* best effort */ }
+        throw new Error("respuesta demasiado grande");
+      }
+      chunks.push(new Uint8Array(chunk));
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return bytes;
+}
+
+async function guardWithDeadline(
+  guard: ResolveOptions["guard"],
+  url: URL,
+  deadline: number,
+) {
+  if (!guard) return;
+  const remaining = deadline - Date.now();
+  if (remaining <= 0) throw new Error("tiempo agotado");
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    await Promise.race([
+      Promise.resolve(guard(url)),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error("tiempo agotado")), remaining);
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
+/** Fetch one response, checking every redirect and consuming its whole body. */
+async function fetchBody(
+  target: string,
+  limit: number,
+  timeoutMs: number,
+  doFetch: Fetcher,
+  guard: ResolveOptions["guard"],
+  globalDeadline?: number,
+): Promise<Loaded> {
+  const deadline = Math.min(Date.now() + timeoutMs, globalDeadline ?? Number.POSITIVE_INFINITY);
+  const seen = new Set<string>();
+  let current = new URL(target).toString();
+
+  for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
+    if (seen.has(current)) throw new Error("redirección circular");
+    seen.add(current);
+    const currentUrl = new URL(current);
+    if (currentUrl.protocol !== "http:" && currentUrl.protocol !== "https:") {
+      throw new Error("esquema no permitido");
+    }
+    await guardWithDeadline(guard, currentUrl, deadline);
+
+    const remaining = deadline - Date.now();
+    if (remaining <= 0) throw new Error("tiempo agotado");
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), remaining);
+    try {
+      const response = await doFetch(current, {
+        signal: controller.signal,
+        redirect: "manual",
+        headers: { "user-agent": UA, accept: "*/*" },
+      });
+
+      if (redirectStatus(response.status)) {
+        const location = response.headers.get("location");
+        if (!location) throw new Error("redirección sin destino");
+        current = new URL(location, current).toString();
+        continue;
+      }
+
+      const finalUrl = new URL(response.url || current).toString();
+      // A custom fetcher may have followed redirects despite redirect:manual.
+      // Check the final URL too, so that path cannot bypass the SSRF guard.
+      await guardWithDeadline(guard, new URL(finalUrl), deadline);
+      const bytes = response.ok ? await readCapped(response, limit, controller.signal) : new Uint8Array();
+      return { response, url: finalUrl, bytes };
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+
+  throw new Error("demasiadas redirecciones");
 }
 
 function toBase64(bytes: Uint8Array): string {
@@ -207,8 +347,14 @@ export async function resolveIcon(target: string, opts: ResolveOptions = {}): Pr
   const htmlLimit = opts.htmlLimit ?? HTML_LIMIT;
   const iconLimit = opts.iconLimit ?? ICON_LIMIT;
   const timeoutMs = opts.timeoutMs ?? TIMEOUT;
+  // The route has a 15s execution budget. Leave a buffer for serialization and
+  // make all page, manifest, redirect and icon requests share this deadline.
+  const resolutionDeadline = Date.now() + RESOLUTION_DEADLINE;
 
   let start: URL;
+  if (/^[a-z][a-z0-9+.-]*:/i.test(target) && !/^https?:\/\//i.test(target)) {
+    return { ok: false, host: target, reason: "esquema no permitido" };
+  }
   try {
     start = new URL(/^https?:\/\//i.test(target) ? target : `https://${target}`);
   } catch {
@@ -216,33 +362,16 @@ export async function resolveIcon(target: string, opts: ResolveOptions = {}): Pr
   }
   const host = start.hostname.replace(/^www\./, "");
 
-  const get = async (url: string, limit: number) => {
-    const u = new URL(url);
-    if (opts.guard) await opts.guard(u);
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), timeoutMs);
-    try {
-      return await doFetch(url, {
-        signal: ctrl.signal,
-        redirect: "follow",
-        headers: { "user-agent": UA, accept: "*/*" },
-      });
-    } finally {
-      clearTimeout(timer);
-    }
-  };
-
   let head: ReturnType<typeof readHead> | null = null;
   let pageUrl = start.toString();
   try {
-    const res = await get(pageUrl, htmlLimit);
-    if (res.ok) {
-      pageUrl = res.url || pageUrl;
-      const html = new TextDecoder().decode(await readCapped(res, htmlLimit));
-      head = readHead(html, pageUrl);
+    const page = await fetchBody(pageUrl, htmlLimit, timeoutMs, doFetch, opts.guard, resolutionDeadline);
+    if (page.response.ok) {
+      pageUrl = page.url;
+      head = readHead(new TextDecoder().decode(page.bytes), pageUrl);
     }
   } catch {
-    /* a site that refuses the page can still have a favicon */
+    /* A site that refuses the page can still have a root favicon. */
   }
 
   const candidates: Candidate[] = head ? candidatesFromHead(head) : [];
@@ -251,46 +380,57 @@ export async function resolveIcon(target: string, opts: ResolveOptions = {}): Pr
 
   if (head?.manifest) {
     try {
-      const res = await get(head.manifest, htmlLimit);
-      if (res.ok) {
-        const json = JSON.parse(new TextDecoder().decode(await readCapped(res, htmlLimit)));
-        candidates.push(...candidatesFromManifest(json, res.url || head.manifest));
+      const manifest = await fetchBody(head.manifest, htmlLimit, timeoutMs, doFetch, opts.guard, resolutionDeadline);
+      if (manifest.response.ok) {
+        const json = JSON.parse(new TextDecoder().decode(manifest.bytes));
+        candidates.push(...candidatesFromManifest(json, manifest.url));
         name = manifestName(json) || name;
         themeColor = manifestThemeColor(json) ?? themeColor;
       }
     } catch {
-      /* a broken manifest is common; the older tags still stand */
+      /* A broken manifest is common; older tags still stand. */
     }
   }
 
-  candidates.push({ url: new URL("/favicon.ico", pageUrl).toString(), source: "favicon.ico", score: 20 });
+  let faviconUrl: string;
+  try {
+    faviconUrl = new URL("/favicon.ico", pageUrl).toString();
+  } catch {
+    faviconUrl = new URL("/favicon.ico", start).toString();
+  }
 
   const seen = new Set<string>();
   const ordered = candidates
     .filter((c) => (seen.has(c.url) ? false : (seen.add(c.url), true)))
     .sort((a, b) => b.score - a.score);
+  // Four broken declarations must never prevent the conventional favicon
+  // from being tried. It is deliberately outside the four candidate budget.
+  const attempts = ordered.slice(0, 4);
+  if (!attempts.some((candidate) => candidate.url === faviconUrl)) {
+    attempts.push({ url: faviconUrl, source: "favicon.ico", score: 20 });
+  }
 
-  for (const c of ordered.slice(0, 4)) {
+  for (const c of attempts) {
     try {
-      const res = await get(c.url, iconLimit);
-      if (!res.ok) continue;
-      const bytes = await readCapped(res, iconLimit);
-      if (bytes.length < 40) continue;
-      const type = sniffImage(bytes, res.headers.get("content-type") ?? "");
+      const loaded = await fetchBody(c.url, iconLimit, timeoutMs, doFetch, opts.guard, resolutionDeadline);
+      if (!loaded.response.ok || loaded.bytes.length === 0) continue;
+      const type = sniffImage(loaded.bytes, loaded.response.headers.get("content-type") ?? "");
       if (!type) continue;
       return {
         ok: true,
         host,
         name: (name || host.split(".")[0]).slice(0, 40),
         themeColor,
-        icon: `data:${type};base64,${toBase64(bytes)}`,
-        iconUrl: c.url,
+        icon: `data:${type};base64,${toBase64(loaded.bytes)}`,
+        iconUrl: loaded.url,
         source: c.source,
-        bytes: bytes.length,
+        provenance: c.source,
+        iconVersion: 1,
+        bytes: loaded.bytes.length,
         contentType: type,
       };
     } catch {
-      /* try the next candidate */
+      /* A bad candidate must not stop the remaining candidates. */
     }
   }
 

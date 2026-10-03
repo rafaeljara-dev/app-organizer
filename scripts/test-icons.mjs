@@ -14,7 +14,8 @@ await esbuild.build({
   bundle: true, platform: "node", format: "esm", target: "node22",
   outfile: join(dir, "entry.mjs"), external: ["node:*"], logLevel: "error",
 });
-const M = await import(join(dir, "entry.mjs"));
+const { pathToFileURL } = await import("node:url");
+const M = await import(pathToFileURL(join(dir, "entry.mjs")).href);
 
 /* ---------------- fixtures ---------------- */
 const PNG = Buffer.from(
@@ -52,6 +53,14 @@ const routes = {
       <link rel="icon" type="image/svg+xml" href="/mark.svg">`))],
 
   "/bare-site": () => [200, "text/html", Buffer.from(page(`<title>Sitio Pelado</title>`))],
+
+  "/broken-top4-site": () => [200, "text/html", Buffer.from(page(`
+      <title>Cuatro rotos</title>
+      <link rel="icon" sizes="512x512" href="/broken-1.png">
+      <link rel="icon" sizes="256x256" href="/broken-2.png">
+      <link rel="icon" sizes="192x192" href="/broken-3.png">
+      <link rel="icon" sizes="180x180" href="/broken-4.png">
+      <link rel="icon" sizes="16x16" href="/favicon.ico">`))],
 
   "/og-site": () => [200, "text/html", Buffer.from(page(`
       <title>Sólo Social</title>
@@ -140,10 +149,15 @@ console.log("\nResolución de iconos");
 {
   const r = await run("/bare-site");
   check("cabecera vacía cae a /favicon.ico", r.ok && r.source === "favicon.ico", r.source);
+  check("conserva todos los bytes del ICO", r.ok && Buffer.from(r.icon.split(",")[1], "base64").equals(ICO), String(r.bytes));
 }
 {
   const r = await run("/og-site");
-  check("og:image como último recurso con imagen", r.ok && ["og-image", "favicon.ico"].includes(r.source), r.source);
+  check("ignora og:image y usa una fuente de icono", r.ok && r.source === "favicon.ico" && !r.iconUrl.includes("social"), r.source);
+}
+{
+  const r = await run("/broken-top4-site");
+  check("prueba favicon aunque fallen cuatro candidatos", r.ok && r.source === "favicon.ico", r.source);
 }
 {
   const r = await run("/relative-site");
@@ -155,7 +169,7 @@ console.log("\nResolución de iconos");
 }
 {
   const r = await run("/huge-site", { iconLimit: 64 * 1024 });
-  check("recorta la imagen al límite", r.ok && r.bytes <= 64 * 1024, String(r.bytes));
+  check("rechaza la imagen que supera el límite y conserva el fallback", r.ok && r.source === "favicon.ico" && r.bytes === ICO.length, String(r.bytes));
 }
 {
   const r = await run("/broken-manifest");
@@ -168,6 +182,20 @@ console.log("\nResolución de iconos");
 {
   const r = await M.resolveIcon(`${origin()}/no-existe-en-absoluto`, { timeoutMs: 4000 });
   check("sitio sin nada devuelve fallo legible", r.ok === true || r.ok === false);
+}
+{
+  const calls = [];
+  const r = await M.resolveIcon("https://github.com", {
+    fetchImpl: async (url) => {
+      calls.push(url);
+      if (url.endsWith("/known.png")) return new Response(PNG, { status: 200, headers: { "content-type": "image/png" } });
+      return new Response(page(`<title>Dominio conocido</title><link rel="icon" href="/known.png">`), {
+        status: 200,
+        headers: { "content-type": "text/html" },
+      });
+    },
+  });
+  check("no salta la red para dominios conocidos", r.ok && r.iconUrl.endsWith("/known.png") && calls.length > 0, JSON.stringify(calls));
 }
 
 console.log("\nUtilidades");
