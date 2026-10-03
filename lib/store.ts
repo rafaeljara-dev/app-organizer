@@ -1,7 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import type { Doc, Settings } from "./types";
+import { isFolder, type AppItem, type Doc, type IconProvenance, type Settings } from "./types";
 import { defaultDoc } from "./defaults";
 
 const DB_NAME = "estante";
@@ -53,13 +53,81 @@ function scheduleWrite(next: Doc) {
   }, 180);
 }
 
+const ICON_SOURCES = new Set<IconProvenance>([
+  "manifest", "apple-touch-icon", "link-icon", "favicon.ico",
+]);
+
+function isRawSvgDataUrl(value: string) {
+  const match = value.match(/^data:image\/svg\+xml(?:;[^,]*)?,(.*)$/is);
+  if (!match || /;base64,/i.test(value.slice(0, value.indexOf(",") + 1))) return false;
+  try {
+    return /<svg\b/i.test(decodeURIComponent(match[1]));
+  } catch {
+    return /<svg\b/i.test(match[1]);
+  }
+}
+
+function clearIcon(next: AppItem): AppItem {
+  const { icon: _icon, iconUrl: _iconUrl, iconSource: _iconSource,
+    provenance: _provenance, iconVersion: _iconVersion, iconTried: _iconTried, ...rest } = next;
+  return rest;
+}
+
+/** Keep downloaded data URLs, but remove generated/obsolete icon payloads. */
+function migrateIcon(raw: AppItem): AppItem {
+  const next = { ...raw };
+  const provenance = next.provenance ?? next.iconSource;
+  const sourceIsKnown = provenance && ICON_SOURCES.has(provenance);
+  const isOgImage = (next.iconSource as string | undefined) === "og-image"
+    || (next.provenance as string | undefined) === "og-image";
+  const isRealDataIcon = typeof next.icon === "string"
+    && /^data:image\//i.test(next.icon)
+    && !isRawSvgDataUrl(next.icon);
+
+  if (isOgImage || (next.icon && !isRealDataIcon) || (provenance && !sourceIsKnown)) {
+    return clearIcon(next);
+  }
+
+  if (!next.icon) return clearIcon(next);
+
+  // Legacy records used iconSource; keep it and also expose the explicit
+  // provenance field for callers that do not know the old name.
+  if (sourceIsKnown) {
+    next.iconSource = provenance;
+    next.provenance = provenance;
+  } else {
+    delete next.iconSource;
+    delete next.provenance;
+  }
+  next.iconVersion = 1;
+  next.iconTried = true;
+  return next;
+}
+
+function migrateApp(raw: AppItem): AppItem {
+  return migrateIcon(raw);
+}
+
 /** Future schema bumps land here, one step per version. */
 function migrate(raw: unknown): Doc | null {
   if (!raw || typeof raw !== "object") return null;
   const d = raw as Partial<Doc>;
   if (d.schemaVersion !== 1 || !Array.isArray(d.pages) || !d.settings) return null;
   const fallback = defaultDoc().settings;
-  return { ...(d as Doc), settings: { ...fallback, ...d.settings } };
+  const settings = { ...fallback, ...d.settings };
+  if (!d.settings.labels) settings.labels = "on";
+
+  const dock = (d.dock ?? []).map(migrateApp);
+  const pages = (d.pages ?? []).map((p) => ({
+    ...p,
+    items: (p.items ?? []).map((it) =>
+      isFolder(it)
+        ? { ...it, items: it.items.map(migrateApp) }
+        : migrateApp(it)
+    ),
+  }));
+
+  return { ...(d as Doc), settings, dock, pages };
 }
 
 export async function boot() {
@@ -67,7 +135,7 @@ export async function boot() {
   loaded = true;
   const stored = await readDb();
   doc = migrate(stored) ?? defaultDoc();
-  if (!stored) scheduleWrite(doc);
+  if (!stored || JSON.stringify(doc) !== JSON.stringify(stored)) scheduleWrite(doc);
   emit();
   try {
     await navigator.storage?.persist?.();
@@ -83,6 +151,9 @@ export function subscribe(fn: () => void) {
 
 const getSnapshot = () => doc;
 const getServerSnapshot = () => null;
+
+/** Read the current in-memory document for follow-up background work. */
+export const getDoc = () => doc;
 
 export function useDoc(): Doc | null {
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
@@ -119,8 +190,11 @@ export function resetDoc() {
  */
 export function exportJson(): string {
   if (!doc) return "";
-  const strip = <T extends { icon?: string; iconSource?: string; iconTried?: boolean }>(a: T): T => {
-    const { icon, iconSource, iconTried, ...rest } = a;
+  const strip = <T extends {
+    icon?: string; iconUrl?: string; iconSource?: string; provenance?: string;
+    iconVersion?: 1; iconTried?: boolean;
+  }>(a: T): T => {
+    const { icon, iconUrl, iconSource, provenance, iconVersion, iconTried, ...rest } = a;
     return rest as T;
   };
   const lean: Doc = {

@@ -36,7 +36,7 @@ const serwist = new Serwist({
       // Resolved site icons: expensive to fetch, safe to keep for a month.
       matcher: ({ url }) => url.pathname === "/api/icon",
       handler: new StaleWhileRevalidate({
-        cacheName: "estante-icon-api",
+        cacheName: "estante-icon-api-v2",
         plugins: [new ExpirationPlugin({ maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 30 })],
       }),
     },
