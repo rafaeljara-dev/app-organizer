@@ -124,13 +124,13 @@ function readDropTarget(clientX: number, clientY: number): DropTarget {
   const cell = hit.closest<HTMLElement>("[data-shortcut-id]");
   if (cell?.dataset.listId) {
     const rect = cell.getBoundingClientRect();
-    const horizontal = rect.width > rect.height * 1.35;
+    const isRow = cell.classList.contains("shortcut-row");
     return {
       listId: cell.dataset.listId,
       itemId: cell.dataset.shortcutId ?? null,
-      after: horizontal
-        ? clientX > rect.left + rect.width / 2
-        : clientY > rect.top + rect.height / 2,
+      after: isRow
+        ? clientY > rect.top + rect.height / 2
+        : clientX > rect.left + rect.width / 2,
     };
   }
   const list = hit.closest<HTMLElement>("[data-drop-list]");

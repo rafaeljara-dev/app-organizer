@@ -154,6 +154,11 @@ export function Shortcut({
     pointerRef.current = session;
     suppressClickRef.current = false;
 
+    if (edit && listId) {
+      try { event.currentTarget.setPointerCapture(event.pointerId); }
+      catch { /* Synthetic pointers and older browsers may not support capture. */ }
+    }
+
     if (event.pointerType === "touch" || event.pointerType === "pen") {
       holdTimerRef.current = setTimeout(() => {
         const current = pointerRef.current;

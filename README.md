@@ -51,12 +51,16 @@ npm install
 npm run dev          # Solo cuando quieras iniciar el servidor local
 npm run typecheck
 npm run test:icons   # Resolvedor, formatos, fallbacks y guardia de red
+npm run test:interaction # agent-browser contra el servidor ya iniciado
 npm run build        # Incluye el service worker de Serwist
 ```
 
 La aplicación usa Next.js, React e IndexedDB. El build utiliza webpack por la
 integración actual de Serwist. Las verificaciones de interacción se realizan con
 `agent-browser` contra un servidor que ya esté en marcha.
+`TEST_URL` permite elegir otra dirección para las pruebas. Las regresiones
+simulan eventos touch y pen, y usan entradas reales de ratón y teclado;
+no sustituyen una comprobación en un teléfono físico.
 
 ## Licencia
 
