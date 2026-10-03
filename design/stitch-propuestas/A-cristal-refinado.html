@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<title>Estante - Cristal refinado</title>
+<!-- Google Fonts & Material Symbols -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@500;600&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface": "#0f1419",
+            "tertiary-fixed": "#71f8e4",
+            "background": "#0f1419",
+            "secondary-container": "#ee9800",
+            "surface-container-highest": "#30353b",
+            "surface-variant": "#30353b",
+            "surface-bright": "#353a3f",
+            "primary-fixed": "#89f5e7",
+            "surface-container": "#1b2025",
+            "on-secondary-container": "#5b3800",
+            "on-secondary-fixed": "#2a1700",
+            "inverse-surface": "#dee3ea",
+            "inverse-on-surface": "#2c3137",
+            "secondary-fixed": "#ffddb8",
+            "secondary": "#ffb95f",
+            "surface-tint": "#6bd8cb",
+            "surface-container-low": "#171c21",
+            "on-primary-fixed": "#00201d",
+            "on-tertiary-fixed-variant": "#005048",
+            "outline-variant": "#3d4947",
+            "on-primary-fixed-variant": "#005049",
+            "on-primary": "#003732",
+            "surface-container-lowest": "#0a0f14",
+            "error-container": "#93000a",
+            "on-tertiary-container": "#00302b",
+            "primary-container": "#29a195",
+            "on-secondary": "#472a00",
+            "on-surface": "#dee3ea",
+            "on-tertiary-fixed": "#00201c",
+            "on-tertiary": "#003731",
+            "tertiary": "#4fdbc8",
+            "surface-dim": "#0f1419",
+            "inverse-primary": "#006a61",
+            "surface-container-high": "#252a30",
+            "tertiary-fixed-dim": "#4fdbc8",
+            "tertiary-container": "#00a392",
+            "on-error-container": "#ffdad6",
+            "on-error": "#690005",
+            "outline": "#879391",
+            "primary-fixed-dim": "#6bd8cb",
+            "primary": "#6bd8cb",
+            "on-surface-variant": "#bcc9c6",
+            "on-primary-container": "#00302b",
+            "on-background": "#dee3ea",
+            "secondary-fixed-dim": "#ffb95f",
+            "error": "#ffb4ab",
+            "on-secondary-fixed-variant": "#653e00"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "gutter": "1rem",
+            "margin": "1rem",
+            "space-xs": "0.25rem",
+            "space-sm": "0.5rem",
+            "gutter-lg": "1.5rem",
+            "margin-lg": "2rem",
+            "space-lg": "1.5rem",
+            "gutter-sm": "0.75rem",
+            "margin-sm": "0.75rem",
+            "space-xl": "2.25rem",
+            "space-md": "1rem"
+          },
+          "fontFamily": {
+            "display-lg": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"],
+            "label-sm": ["JetBrains Mono"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "body-lg": ["Inter"],
+            "label-xs": ["JetBrains Mono"],
+            "display-lg-mobile": ["Plus Jakarta Sans"],
+            "label-md": ["Inter"],
+            "body-sm": ["Inter"],
+            "body-md": ["Inter"]
+          },
+          "fontSize": {
+            "display-lg": ["40px", { "lineHeight": "48px", "letterSpacing": "-0.03em", "fontWeight": "700" }],
+            "headline-sm": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "headline-lg": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "500" }],
+            "headline-md": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.015em", "fontWeight": "600" }],
+            "body-lg": ["17px", { "lineHeight": "24px", "letterSpacing": "-0.011em", "fontWeight": "400" }],
+            "label-xs": ["10px", { "lineHeight": "12px", "letterSpacing": "0.06em", "fontWeight": "500" }],
+            "display-lg-mobile": ["32px", { "lineHeight": "38px", "letterSpacing": "-0.025em", "fontWeight": "700" }],
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "600" }],
+            "body-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0em", "fontWeight": "400" }],
+            "body-md": ["15px", { "lineHeight": "22px", "letterSpacing": "-0.006em", "fontWeight": "400" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .material-symbols-fill {
+      font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    
+    /* Liquid Glass & Specular highlight presets */
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: blur(28px) saturate(190%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.12), 0 8px 32px 0 rgba(0, 0, 0, 0.36);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+    }
+
+    .glass-capsule {
+      background: rgba(18, 26, 33, 0.65);
+      backdrop-filter: blur(32px) saturate(200%);
+      -webkit-backdrop-filter: blur(32px) saturate(200%);
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.15), 0 12px 28px -6px rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .glass-app-squircle {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.22);
+      transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .glass-app-squircle:active {
+      transform: scale(0.92);
+    }
+
+    /* Spine glass reflection for app squircles */
+    .glass-specular-edge::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      background: linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 40%, transparent 60%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    /* Ambient Background Orbs */
+    .ambient-glow-teal {
+      background: radial-gradient(circle, rgba(20, 184, 166, 0.28) 0%, rgba(13, 148, 136, 0.12) 40%, transparent 70%);
+      filter: blur(60px);
+    }
+    .ambient-glow-amber {
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.22) 0%, rgba(217, 119, 6, 0.08) 45%, transparent 70%);
+      filter: blur(65px);
+    }
+    .ambient-glow-deep {
+      background: radial-gradient(circle, rgba(14, 116, 144, 0.18) 0%, transparent 65%);
+      filter: blur(50px);
+    }
+
+    /* Safe viewport constraints */
+    .safe-bottom-buffer {
+      padding-bottom: calc(108px + env(safe-area-inset-bottom, 20px));
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-container-lowest text-on-surface antialiased select-none min-h-screen overflow-x-hidden relative font-body-md">
+<!-- ATMOSPHERIC BACKGROUND (Z-0) -->
+<div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+<!-- Abyssal dark backdrop base -->
+<div class="absolute inset-0 bg-[#070b0e]"></div>
+<!-- Top-Right Luminous Deep Teal -->
+<div class="ambient-glow-teal absolute -top-24 -right-24 w-96 h-96 rounded-full opacity-90 animate-pulse" style="animation-duration: 9s;"></div>
+<!-- Bottom-Left Warm Amber Kinetic Glow -->
+<div class="ambient-glow-amber absolute bottom-12 -left-20 w-96 h-96 rounded-full opacity-80"></div>
+<!-- Center Atmosphere Depth Shifter -->
+<div class="ambient-glow-deep absolute top-1/3 left-1/4 w-80 h-80 rounded-full opacity-60"></div>
+</div>
+<!-- APPLICATION CANVAS (Z-10) -->
+<div class="relative z-10 max-w-md mx-auto min-h-screen flex flex-col px-margin pt-2 safe-bottom-buffer">
+<!-- 1. TopAppBar & Brand Identity (Shared Components JSON Anchor) -->
+<header class="flex justify-between items-center w-full px-margin py-space-sm max-w-md mx-auto pt-4">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="bookmarks">bookmarks</span>
+<span class="text-headline-md font-headline-md font-bold tracking-tight text-on-surface">Estante</span>
+</div>
+<div class="flex items-center space-x-3">
+<button class="w-9 h-9 rounded-full glass-panel flex items-center justify-center text-on-surface-variant hover:text-on-surface active:scale-95 transition-all">
+<span class="material-symbols-outlined text-lg" data-icon="tune">tune</span>
+</button>
+</div>
+</header>
+<!-- Top Greeting Header -->
+<section class="mt-4 mb-4 flex items-center justify-between">
+<div class="flex flex-col">
+<span class="text-label-xs font-label-xs text-slate-400 tracking-wider uppercase font-medium">Sábado 3 de octubre</span>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-semibold text-white tracking-tight mt-0.5 drop-shadow-sm">Buenos días, Rafael</h1>
+</div>
+<!-- Glass Avatar Button -->
+<button aria-label="Ajustes de perfil" class="relative w-11 h-11 rounded-full p-[1.5px] bg-gradient-to-tr from-primary/60 via-white/20 to-secondary/50 shadow-lg active:scale-95 transition-transform">
+<div class="w-full h-full rounded-full bg-surface-container-high/90 backdrop-blur-md flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Close-up portrait of Rafael smiling warmly in a dark minimalist studio environment, soft directional cyan and warm amber rim lighting reflecting on his face, matching the frosted glass aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7BxryI0Dl8uLagwRoH_XulwDhNXKeC81ti6OVPtSkYZ8FjMD-3m0V2WzJ0lxeOJqHGPyQkaFnu5B-_boLiGyTJFOqPJPgYdYgMlC9-qFhUKZ6IhGCVtuyBjOEZw7FoIlFozQr4cF1aYdZi-9eVt36roakNTkIr6LUDBSgPCHVkQTRZW1LUJMcrmeUzhnRshilkWqBTcL-bJkK0WEfRpip6suKbrD46JqBFGfRZbEOPcQjfxl_wC3WUtDf7sJXsUtaowNPKu4dScu8"/>
+</div>
+<div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-[#14B8A6] border-2 border-surface-container-lowest ring-1 ring-primary/40"></div>
+</button>
+</section>
+<!-- 2. Glass Search Pill -->
+<section class="my-2">
+<div class="relative w-full rounded-full glass-capsule px-4 py-3 flex items-center shadow-lg transition-all focus-within:ring-2 focus-within:ring-primary/40 focus-within:border-primary/50">
+<span class="material-symbols-outlined text-on-surface-variant/80 text-xl mr-3 flex-shrink-0" data-icon="search">search</span>
+<input class="bg-transparent border-0 outline-none w-full text-white placeholder:text-on-surface-variant/50 font-body-md text-sm p-0 focus:ring-0 leading-tight" placeholder="Buscar o pegar una dirección" type="text"/>
+<button aria-label="Añadir web app" class="w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center text-white/90 active:scale-90 transition-transform ml-2 flex-shrink-0 shadow-sm">
+<span class="material-symbols-outlined text-sm font-semibold" data-icon="add">add</span>
+</button>
+</div>
+</section>
+<!-- 3. Horizontal row 'Recientes' -->
+<section class="mt-4 mb-2">
+<div class="flex items-center justify-between mb-3 px-1">
+<span class="text-body-sm font-body-sm text-white/80 font-medium">Recientes</span>
+<button class="text-label-xs font-label-xs text-primary hover:text-primary-fixed transition-colors font-semibold tracking-wide">Ver todo</button>
+</div>
+<!-- 5 compact circular app chips -->
+<div class="flex justify-between items-start px-0.5">
+<!-- Gmail -->
+<div class="flex flex-col items-center gap-1.5 group cursor-pointer active:scale-95 transition-transform">
+<div class="w-13 h-13 p-2.5 rounded-full glass-panel flex items-center justify-center relative hover:border-white/30 transition-all">
+<!-- Gmail SVG -->
+<svg class="w-6 h-6" viewbox="0 0 24 24">
+<path d="M12 12.713L2.4 5.513V18c0 .66.54 1.2 1.2 1.2H6V10.2L12 14.7l6-4.5v9H19.2c.66 0 1.2-.54 1.2-1.2V5.513L12 12.713z" fill="#EA4335"></path>
+<path d="M19.2 4.8H18v5.4l-6-4.5-6 4.5V4.8H4.8C4.14 4.8 3.6 5.34 3.6 6v.487l8.4 6.3 8.4-6.3V6c0-.66-.54-1.2-1.2-1.2z" fill="#4285F4"></path>
+</svg>
+</div>
+<span class="text-label-xs font-label-xs text-slate-300 font-medium group-hover:text-white">Gmail</span>
+</div>
+<!-- WhatsApp -->
+<div class="flex flex-col items-center gap-1.5 group cursor-pointer active:scale-95 transition-transform">
+<div class="w-13 h-13 p-2.5 rounded-full glass-panel flex items-center justify-center relative hover:border-white/30 transition-all">
+<!-- WhatsApp SVG -->
+<svg class="w-6 h-6" viewbox="0 0 24 24">
+<path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2z" fill="#25D366"></path>
+<path d="M17.47 14.38c-.3-.15-1.77-.87-2.04-.97-.28-.1-.48-.15-.68.15-.2.3-.78.97-.95 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.39-1.48-.88-.79-1.48-1.77-1.65-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.68-1.64-.93-2.25-.24-.6-.49-.52-.68-.53l-.58-.01c-.2 0-.52.07-.8.37-.27.3-1.05 1.03-1.05 2.51 0 1.48 1.08 2.91 1.23 3.11.15.2 2.13 3.25 5.16 4.56.72.31 1.28.5 1.72.64.72.23 1.38.2 1.9.12.58-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.08-.12-.27-.2-.57-.35z" fill="#FFF"></path>
+</svg>
+</div>
+<span class="text-label-xs font-label-xs text-slate-300 font-medium group-hover:text-white">WhatsApp</span>
+</div>
+<!-- Claude -->
+<div class="flex flex-col items-center gap-1.5 group cursor-pointer active:scale-95 transition-transform">
+<div class="w-13 h-13 p-2.5 rounded-full glass-panel flex items-center justify-center relative hover:border-white/30 transition-all">
+<!-- Claude Anthropic Icon -->
+<svg class="w-6 h-6" fill="#D97706" viewbox="0 0 24 24">
+<path d="M14.5 4L9 19.5h2.5L17 4h-2.5zm-5 0L4 19.5h2.5L12 4H9.5z"></path>
+</svg>
+</div>
+<span class="text-label-xs font-label-xs text-slate-300 font-medium group-hover:text-white">Claude</span>
+</div>
+<!-- Notion -->
+<div class="flex flex-col items-center gap-1.5 group cursor-pointer active:scale-95 transition-transform">
+<div class="w-13 h-13 p-2.5 rounded-full glass-panel flex items-center justify-center relative hover:border-white/30 transition-all">
+<!-- Notion SVG -->
+<svg class="w-6 h-6" fill="#FFFFFF" viewbox="0 0 24 24">
+<path d="M4.459 4.208c.746.606 1.026.56 2.428.466l11.373-.84c1.12-.093 1.399.374 1.12 1.306l-2.052 13.064c-.187.933-.746 1.399-1.772 1.493l-11.467.746c-.933.093-1.399-.28-1.399-1.213L4.46 4.208zm3.639 2.893l-.84 9.89 2.053-.187.56-6.905 4.385 7.092 2.706-.187.84-9.89-2.053.187-.56 6.812-4.292-6.906-2.799.094z"></path>
+</svg>
+</div>
+<span class="text-label-xs font-label-xs text-slate-300 font-medium group-hover:text-white">Notion</span>
+</div>
+<!-- Figma -->
+<div class="flex flex-col items-center gap-1.5 group cursor-pointer active:scale-95 transition-transform">
+<div class="w-13 h-13 p-2.5 rounded-full glass-panel flex items-center justify-center relative hover:border-white/30 transition-all">
+<!-- Figma SVG -->
+<svg class="w-6 h-6" viewbox="0 0 24 24">
+<path d="M12 12a3 3 0 1 1 6 0 3 3 0 0 1-6 0z" fill="#F24E1E"></path>
+<path d="M6 12a3 3 0 0 1 3-3h3v6H9a3 3 0 0 1-3-3z" fill="#A259FF"></path>
+<path d="M6 6a3 3 0 0 1 3-3h3v6H9a3 3 0 0 1-3-3z" fill="#F24E1E"></path>
+<path d="M12 3h3a3 3 0 0 1 0 6h-3V3z" fill="#FF7262"></path>
+<path d="M6 18a3 3 0 0 1 3-3h3v3a3 3 0 0 1-3 3 3 3 0 0 1-3-3z" fill="#1ABCFE"></path>
+</svg>
+</div>
+<span class="text-label-xs font-label-xs text-slate-300 font-medium group-hover:text-white">Figma</span>
+</div>
+</div>
+</section>
+<!-- 4. Segmented Page Tabs (Glass Chips) -->
+<section class="mt-4 mb-3">
+<div class="flex items-center space-x-2 overflow-x-auto no-scrollbar py-1">
+<!-- Active Tab: Diario 9 -->
+<button class="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full bg-primary/20 border border-primary/45 shadow-[0_0_16px_rgba(20,184,166,0.35)] text-white text-body-sm font-medium tracking-tight">
+<span>Diario</span>
+<span class="text-label-xs font-label-xs bg-primary/30 text-primary-fixed px-1.5 py-0.5 rounded-full">9</span>
+</button>
+<!-- Tab: Crear 6 -->
+<button class="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full glass-panel text-on-surface-variant hover:text-white hover:bg-white/10 text-body-sm font-medium transition-all">
+<span>Crear</span>
+<span class="text-label-xs font-label-xs bg-white/10 text-on-surface-variant px-1.5 py-0.5 rounded-full">6</span>
+</button>
+<!-- Tab: Ocio 6 -->
+<button class="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-full glass-panel text-on-surface-variant hover:text-white hover:bg-white/10 text-body-sm font-medium transition-all">
+<span>Ocio</span>
+<span class="text-label-xs font-label-xs bg-white/10 text-on-surface-variant px-1.5 py-0.5 rounded-full">6</span>
+</button>
+<!-- Add Page Chip -->
+<button aria-label="Añadir página" class="w-8 h-8 rounded-full glass-panel flex items-center justify-center text-on-surface-variant hover:text-white active:scale-95 transition-all ml-1">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+</button>
+</div>
+</section>
+<!-- 5. App Grid (4 columns) -->
+<main class="mt-3">
+<div class="grid grid-cols-4 gap-y-5 gap-x-3.5 justify-items-center">
+<!-- 1. Google Calendar -->
+<div class="flex flex-col items-center gap-1.5 cursor-pointer">
+<div class="w-16 h-16 bg-white glass-app-squircle glass-specular-edge flex flex-col items-center justify-between p-2 shadow-lg">
+<div class="w-full text-center text-[10px] font-bold text-[#EA4335] uppercase tracking-wider leading-none pt-0.5">OCT</div>
+<div class="text-2xl font-bold text-[#1F1F1F] leading-none pb-0.5">31</div>
+</div>
+<span class="text-label-md font-label-md text-white text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] tracking-tight">Calendar</span>
+</div>
+<!-- 2. Google Drive -->
+<div class="flex flex-col items-center gap-1.5 cursor-pointer">
+<div class="w-16 h-16 bg-[#1f2937]/90 glass-app-squircle glass-specular-edge flex items-center justify-center p-3 shadow-lg">
+<svg class="w-9 h-9" viewbox="0 0 24 24">
+<path d="M19.35 10.04L14.7 2H9.3l4.65 8.04h5.4z" fill="#0066DA"></path>
+<path d="M8.05 13.96L3.4 6 0 11.96l4.65 8.04 3.4-6z" fill="#00AC47"></path>
+<path d="M9.3 22h9.35l4.65-8.04h-9.35L9.3 22z" fill="#EA4335"></path>
+<path d="M14.7 13.96H5.35L0 22h9.3l5.4-8.04z" fill="#FFBA00"></path>
+</svg>
+</div>
+<span class="text-label-md font-label-md text-white text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] tracking-tight">Drive</span>
+</div>
+<!-- 3. Google Photos -->
+<div class="flex flex-col items-center gap-1.5 cursor-pointer">
+<div class="w-16 h-16 bg-white glass-app-squircle glass-specular-edge flex items-center justify-center p-3 shadow-lg">
+<svg class="w-9 h-9" viewbox="0 0 24 24">
+<path d="M12 6.5A5.5 5.5 0 0 1 17.5 12c0 3.038-2.462 5.5-5.5 5.5V12H6.5A5.5 5.5 0 0 1 12 6.5z" fill="#EA4335"></path>
+<path d="M6.5 12A5.5 5.5 0 0 1 12 6.5c3.038 0 5.5 2.462 5.5 5.5H12v5.5A5.5 5.5 0 0 1 6.5 12z" fill="#4285F4"></path>
+<path d="M12 17.5A5.5 5.5 0 0 1 6.5 12c0-3.038 2.462-5.5 5.5-5.5V12h5.5a5.5 5.5 0 0 1-5.5 5.5z" fill="#FBBC04"></path>
+<path d="M17.5 12A5.5 5.5 0 0 1 12 17.5c-3.038 0-5.5-2.462-5.5-5.5H12V6.5a5.5 5.5 0 0 1 5.5 5.5z" fill="#34A853"></path>
+</svg>
+</div>
+<span class="text-label-md font-label-md text-white text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] tracking-tight">Fotos</span>
+</div>
+<!-- 4. Google Keep -->
+<div class="flex flex-col items-center gap-1.5 cursor-pointer">
+<div class="w-16 h-16 bg-[#F9AB00] glass-app-squircle glass-specular-edge flex items-center justify-center p-3 shadow-lg">
+<svg class="w-9 h-9" fill="#FFFFFF" viewbox="0 0 24 24">
+<path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6A4.997 4.997 0 0 1 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"></path>
+</svg>
+</div>
+<span class="text-label-md font-label-md text-white text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] tracking-tight">Keep</span>
+</div>
+<!-- 5. YouTube -->
+<div class="flex flex-col items-center gap-1.5 cursor-pointer">
+<div class="w-16 h-16 bg-[#FF0000] glass-app-squircle glass-specular-edge flex items-center justify-center p-3 shadow-lg">
+<svg class="w-9 h-9" fill="#FFFFFF" viewbox="0 0 24 24">
+<path d="M21.58 7.19a2.506 2.506 0 0 0-1.76-1.77C18.26 5 12 5 12 5s-6.26 0-7.82.42c-.87.23-1.54.91-1.77 1.77C2 8.75 2 12 2 12s0 3.25.41 4.81c.23.87.9 1.54 1.77 1.77C5.74 19 12 19 12 19s6.26 0 7.82-.42c.86-.23 1.54-.9 1.76-1.77C22 15.25 22 12 22 12s0-3.25-.42-4.81zM10 15V9l5.2 3-5.2 3z"></path>
+</svg>
+</div>
+<span class="text-label-md font-label-md text-white text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] tracking-tight">YouTube</span>
+</div>
+<!-- 6. Google Translate -->
+<div class="flex flex-col items-center gap-1.5 cursor-pointer">
+<div class="w-16 h-16 bg-white glass-app-squircle glass-specular-edge flex items-center justify-center p-3 shadow-lg">
+<svg class="w-9 h-9" viewbox="0 0 24 24">
+<path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0 0 14.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.11 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z" fill="#4285F4"></path>
+</svg>
+</div>
+<span class="text-label-md font-label-md text-white text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] tracking-tight">Traductor</span>
+</div>
+<!-- 7. Google Meet -->
+<div class="flex flex-col items-center gap-1.5 cursor-pointer">
+<div class="w-16 h-16 bg-[#16222F] glass-app-squircle glass-specular-edge flex items-center justify-center p-3 shadow-lg">
+<svg class="w-8 h-8" viewbox="0 0 24 24">
+<rect fill="#00832D" height="14" rx="2" width="12" x="3" y="5"></rect>
+<path d="M15 10.5l5-3.5v10l-5-3.5v-3z" fill="#00AC47"></path>
+<path d="M15 13.5l5 3.5v-2l-5-3.5v2z" fill="#0066DA"></path>
+<path d="M3 7a2 2 0 0 1 2-2h4v5H3V7z" fill="#EA4335"></path>
+<path d="M3 14h6v5H5a2 2 0 0 1-2-2v-3z" fill="#2684FC"></path>
+<path d="M9 5h4a2 2 0 0 1 2 2v3H9V5z" fill="#FFBA00"></path>
+</svg>
+</div>
+<span class="text-label-md font-label-md text-white text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] tracking-tight">Meet</span>
+</div>
+<!-- 8. Google Sheets -->
+<div class="flex flex-col items-center gap-1.5 cursor-pointer">
+<div class="w-16 h-16 bg-[#0F9D58] glass-app-squircle glass-specular-edge flex items-center justify-center p-3 shadow-lg">
+<svg class="w-8 h-8" fill="#FFFFFF" viewbox="0 0 24 24">
+<path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-3h6v3zm0-4H6v-3h6v3zm0-4H6V6h6v3zm6 8h-5v-3h5v3zm0-4h-5v-3h5v3zm0-4h-5V6h5v3z"></path>
+</svg>
+</div>
+<span class="text-label-md font-label-md text-white text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] tracking-tight">Hojas</span>
+</div>
+<!-- 9. 'Trabajo' folder squircle (frosted dark glass containing 4 miniature icons) -->
+<div class="flex flex-col items-center gap-1.5 cursor-pointer">
+<div class="w-16 h-16 rounded-[20px] bg-white/10 backdrop-blur-2xl border border-white/20 p-2 shadow-lg grid grid-cols-2 gap-1.5 items-center justify-items-center relative glass-specular-edge active:scale-95 transition-transform">
+<!-- Mini Notion -->
+<div class="w-5 h-5 bg-black/70 rounded-md flex items-center justify-center p-0.5">
+<svg class="w-3.5 h-3.5" fill="#FFFFFF" viewbox="0 0 24 24">
+<path d="M4.459 4.208c.746.606 1.026.56 2.428.466l11.373-.84c1.12-.093 1.399.374 1.12 1.306l-2.052 13.064c-.187.933-.746 1.399-1.772 1.493l-11.467.746c-.933.093-1.399-.28-1.399-1.213L4.46 4.208zm3.639 2.893l-.84 9.89 2.053-.187.56-6.905 4.385 7.092 2.706-.187.84-9.89-2.053.187-.56 6.812-4.292-6.906-2.799.094z"></path>
+</svg>
+</div>
+<!-- Mini Slack -->
+<div class="w-5 h-5 bg-[#4A154B] rounded-md flex items-center justify-center p-0.5">
+<svg class="w-3.5 h-3.5" fill="#E01E5A" viewbox="0 0 24 24">
+<circle cx="6" cy="6" fill="#E01E5A" r="2.5"></circle>
+<circle cx="18" cy="6" fill="#36C5F0" r="2.5"></circle>
+<circle cx="18" cy="18" fill="#2EB67D" r="2.5"></circle>
+<circle cx="6" cy="18" fill="#ECB22E" r="2.5"></circle>
+</svg>
+</div>
+<!-- Mini Linear -->
+<div class="w-5 h-5 bg-[#5E6AD2] rounded-md flex items-center justify-center p-0.5">
+<svg class="w-3 h-3 text-white" fill="currentColor" viewbox="0 0 24 24">
+<path d="M3 13h18v-2H3v2zm0 5h12v-2H3v2zm0-10h18V6H3v2z"></path>
+</svg>
+</div>
+<!-- Mini Trello -->
+<div class="w-5 h-5 bg-[#0079BF] rounded-md flex items-center justify-center p-0.5">
+<div class="flex gap-0.5">
+<div class="w-1 h-2.5 bg-white rounded-xs"></div>
+<div class="w-1 h-1.5 bg-white rounded-xs"></div>
+</div>
+</div>
+</div>
+<span class="text-label-md font-label-md text-white text-center drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] tracking-tight">Trabajo</span>
+</div>
+</div>
+</main>
+<!-- 6. Page Indicator Dots -->
+<div class="flex items-center justify-center space-x-2 my-5">
+<div class="w-5 h-1.5 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.7)] transition-all"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-white/30 hover:bg-white/50 transition-colors"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-white/30 hover:bg-white/50 transition-colors"></div>
+</div>
+</div>
+<!-- 7. Floating Glass Dock (BottomNavBar Destination) -->
+<nav aria-label="Navegación principal" class="fixed bottom-0 left-0 right-0 z-50 flex justify-around items-center px-space-md py-space-xs mb-space-sm max-w-xs mx-auto bg-surface-container-lowest/80 backdrop-blur-2xl rounded-full border border-outline-variant/40 shadow-2xl shadow-surface-container-lowest/50">
+<!-- App 1: Gmail -->
+<button aria-label="Gmail" class="relative w-12 h-12 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-90 transition-all flex items-center justify-center p-2.5 group">
+<svg class="w-6 h-6" viewbox="0 0 24 24">
+<path d="M12 12.713L2.4 5.513V18c0 .66.54 1.2 1.2 1.2H6V10.2L12 14.7l6-4.5v9H19.2c.66 0 1.2-.54 1.2-1.2V5.513L12 12.713z" fill="#EA4335"></path>
+<path d="M19.2 4.8H18v5.4l-6-4.5-6 4.5V4.8H4.8C4.14 4.8 3.6 5.34 3.6 6v.487l8.4 6.3 8.4-6.3V6c0-.66-.54-1.2-1.2-1.2z" fill="#4285F4"></path>
+</svg>
+<!-- Subtly active dot indicator -->
+<span class="absolute -bottom-1 w-1 h-1 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></span>
+</button>
+<!-- App 2: WhatsApp -->
+<button aria-label="WhatsApp" class="relative w-12 h-12 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-90 transition-all flex items-center justify-center p-2.5 group">
+<svg class="w-6 h-6" viewbox="0 0 24 24">
+<path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2z" fill="#25D366"></path>
+<path d="M17.47 14.38c-.3-.15-1.77-.87-2.04-.97-.28-.1-.48-.15-.68.15-.2.3-.78.97-.95 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.46-2.39-1.48-.88-.79-1.48-1.77-1.65-2.07-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.02-.52-.08-.15-.68-1.64-.93-2.25-.24-.6-.49-.52-.68-.53l-.58-.01c-.2 0-.52.07-.8.37-.27.3-1.05 1.03-1.05 2.51 0 1.48 1.08 2.91 1.23 3.11.15.2 2.13 3.25 5.16 4.56.72.31 1.28.5 1.72.64.72.23 1.38.2 1.9.12.58-.09 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.08-.12-.27-.2-.57-.35z" fill="#FFF"></path>
+</svg>
+<span class="absolute -bottom-1 w-1 h-1 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></span>
+</button>
+<!-- App 3: Claude (Active Home Ecosystem) -->
+<button aria-label="Claude" class="relative w-12 h-12 rounded-2xl bg-primary/20 text-primary border border-primary/40 active:scale-90 transition-all flex items-center justify-center p-2.5 shadow-[0_0_16px_rgba(20,184,166,0.3)]">
+<svg class="w-6 h-6" fill="#6bd8cb" viewbox="0 0 24 24">
+<path d="M14.5 4L9 19.5h2.5L17 4h-2.5zm-5 0L4 19.5h2.5L12 4H9.5z"></path>
+</svg>
+<!-- Illuminated active state glow dot -->
+<span class="absolute -bottom-1 w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_6px_#6bd8cb]"></span>
+</button>
+<!-- App 4: Google Maps -->
+<button aria-label="Google Maps" class="relative w-12 h-12 rounded-2xl bg-white/5 hover:bg-white/10 active:scale-90 transition-all flex items-center justify-center p-2.5 group">
+<svg class="w-6 h-6" viewbox="0 0 24 24">
+<path d="M18.5 4.5A7.5 7.5 0 0 0 12 1a7.5 7.5 0 0 0-6.5 3.5L12 12l6.5-7.5z" fill="#4285F4"></path>
+<path d="M12 12L5.5 4.5A7.47 7.47 0 0 0 4.5 8c0 4.5 6.5 13 7.5 14 1-1 7.5-9.5 7.5-14 0-1.28-.35-2.48-1-3.5L12 12z" fill="#34A853"></path>
+<circle cx="12" cy="8" fill="#EA4335" r="2.5"></circle>
+</svg>
+<span class="absolute -bottom-1 w-1 h-1 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-opacity"></span>
+</button>
+</nav>
+<!-- Micro-interactions Script -->
+<script>
+    // Simple tactile feedback on touch
+    document.querySelectorAll('button, .glass-app-squircle').forEach(elem => {
+      elem.addEventListener('touchstart', () => {
+        elem.style.transform = 'scale(0.94)';
+      }, {passive: true});
+      elem.addEventListener('touchend', () => {
+        elem.style.transform = '';
+      }, {passive: true});
+    });
+  </script>
+</body></html>

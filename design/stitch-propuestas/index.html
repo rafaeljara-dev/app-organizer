@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estante — Auditoría UI y propuestas de rediseño</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --ink:#16181b; --ink2:#4a5058; --ink3:#7b828c; --line:#e3e5e8; --bg:#f6f6f4; --card:#fff; --acc:#0E7C74; --bad:#B23D1E; --warn:#B7791F; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: Roboto, system-ui, sans-serif; color:var(--ink); background:var(--bg); font-size:20px; line-height:1.5; }
+  main { max-width: 2000px; margin: 0 auto; padding: 56px 48px 96px; }
+  h1 { font-size: 56px; font-weight: 900; letter-spacing: -0.02em; margin: 0 0 8px; }
+  h2 { font-size: 38px; font-weight: 700; margin: 72px 0 20px; letter-spacing: -0.01em; }
+  h3 { font-size: 26px; margin: 0 0 8px; }
+  .lead { font-size: 24px; color: var(--ink2); max-width: 1400px; }
+  code, .mono { font-family: "Roboto Mono", monospace; font-size: 0.85em; }
+  .shots { display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+  .shots figure { margin:0; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:12px; }
+  .shots img { width:100%; border-radius:10px; display:block; }
+  figcaption { font-size: 17px; color: var(--ink2); padding: 10px 4px 2px; }
+  table { width:100%; border-collapse: collapse; background:var(--card); border:1px solid var(--line); border-radius:16px; overflow:hidden; font-size:19px; }
+  th, td { text-align:left; padding: 14px 18px; border-bottom:1px solid var(--line); vertical-align: top; }
+  th { background:#fafafa; font-weight:700; font-size:17px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink3); }
+  .sev { font-weight:700; font-size:15px; padding:3px 10px; border-radius:99px; white-space:nowrap; }
+  .s1 { background:#fde8e3; color:var(--bad); } .s2 { background:#fdf1dc; color:var(--warn); } .s3 { background:#e5f3f1; color:var(--acc); }
+  .props { display:grid; grid-template-columns: repeat(4, 1fr); gap: 28px; }
+  .prop { background:var(--card); border:1px solid var(--line); border-radius:20px; padding:20px; display:flex; flex-direction:column; gap:12px; }
+  .prop img { width:100%; border-radius:14px; border:1px solid var(--line); }
+  .prop .tag { font-family:"Roboto Mono"; font-size:15px; color:var(--acc); font-weight:500; }
+  .prop ul { margin:0; padding-left: 22px; font-size: 18px; }
+  .prop .pro li::marker { color: var(--acc); } .prop .con li::marker { color: var(--bad); }
+  .wide { grid-column: 1 / -1; display:grid; grid-template-columns: 2.2fr 1fr; gap: 28px; align-items:start; }
+  .score { display:flex; gap:8px; flex-wrap:wrap; }
+  .score span { font-size:15px; background:#f0f1f2; border-radius:8px; padding:4px 10px; }
+  .rec { background:#e9f5f3; border:2px solid var(--acc); border-radius:20px; padding: 28px 32px; font-size:21px; }
+  @media (max-width: 1400px) { .props { grid-template-columns: repeat(2, 1fr); } .wide { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Estante — auditoría de UI y propuestas</h1>
+  <p class="lead">Auditoría hecha con <span class="mono">agent-browser</span> sobre <span class="mono">localhost:3000</span> (móvil 390×844 y escritorio 1440×900), más cinco direcciones de diseño generadas en Stitch (proyecto <span class="mono">13081855326015627181</span>).</p>
+
+  <h2>1. Estado actual</h2>
+  <div class="shots">
+    <figure><img src="../auditoria/01-home-mobile.png"><figcaption>Inicio (oscuro): seis iconos idénticos de «G» y sin nombres.</figcaption></figure>
+    <figure><img src="../auditoria/10-light-labels.png"><figcaption>Claro con etiquetas: Calendario, Drive, Keep y Sheets se ven iguales.</figcaption></figure>
+    <figure><img src="../auditoria/09-desktop.png"><figcaption>Escritorio: una sola fila de iconos, 80 % de vacío y el dock deformado.</figcaption></figure>
+    <figure><img src="../auditoria/11-list.png"><figcaption>Vista lista: la miniatura de la carpeta «Trabajo» se rompe y tapa filas.</figcaption></figure>
+    <figure><img src="../auditoria/04-folder.png"><figcaption>Carpeta: iconos cortados por abajo, sin nombres.</figcaption></figure>
+    <figure><img src="../auditoria/06-add.png"><figcaption>Añadir: el catálogo usa glifos de línea genéricos, no los logos reales.</figcaption></figure>
+    <figure><img src="../auditoria/05-settings.png"><figcaption>Ajustes: una sola lista larga y opciones técnicas («Refracción»).</figcaption></figure>
+    <figure><img src="../auditoria/08-menu.png"><figcaption>Menú contextual: correcto, pero solo se descubre con clic derecho o pulsación larga.</figcaption></figure>
+  </div>
+
+  <h2>2. Hallazgos</h2>
+  <table>
+    <tr><th>Sev.</th><th>Problema</th><th>Causa</th><th>Arreglo</th></tr>
+    <tr><td><span class="sev s1">Crítico</span></td><td>Calendario, Drive, Keep, Sheets y Gmail muestran la «G» genérica de Google.</td><td>Sin sesión, esos dominios redirigen a <code>accounts.google.com</code>; <code>/api/icon</code> lee el favicon del login (data:image/x-icon de 16 px).</td><td>Detectar redirección a un dominio de login y descartarla; tabla de iconos curada para servicios conocidos (Google Workspace, Microsoft) o Simple Icons/SVG oficiales en el catálogo.</td></tr>
+    <tr><td><span class="sev s1">Crítico</span></td><td>Etiquetas desactivadas por defecto: no se sabe qué es cada icono.</td><td><code>labels: "off"</code> en <code>defaults.ts</code>; además los enlaces quedan sin nombre accesible.</td><td>Etiquetas activadas por defecto y <code>aria-label</code> siempre en la tesela.</td></tr>
+    <tr><td><span class="sev s1">Crítico</span></td><td>En escritorio el dock se deforma (WhatsApp y Maps recortados) y la cuadrícula ocupa una sola fila.</td><td><code>.dockrow .ico { width:100%; height:60px }</code> con celdas <code>flex:1</code>; <code>.shell</code> limitado a 1080 px.</td><td>Iconos cuadrados de tamaño fijo en el dock; diseño de escritorio propio (barra lateral + cuadrícula ancha).</td></tr>
+    <tr><td><span class="sev s2">Alto</span></td><td>Esquinas «dobladas» y brillos raros en chips, botones y dock.</td><td>La capa <code>.glass-refract</code> (filtro SVG de backdrop) junto con <code>.glass::after</code> dibuja artefactos en las esquinas.</td><td>Refracción desactivada por defecto o eliminada; cristal limpio con blur y un borde de 1 px.</td></tr>
+    <tr><td><span class="sev s2">Alto</span></td><td>La carpeta en vista lista se rompe.</td><td><code>.ico.folder</code> no recibe el tamaño de <code>.row .ico</code> (40 px).</td><td>Dar el mismo tamaño a <code>.row .ico.folder</code> y usar miniaturas reales.</td></tr>
+    <tr><td><span class="sev s2">Alto</span></td><td>La miniatura de carpeta son cuadrados de color, no los iconos que contiene.</td><td><code>Ico</code> pinta <code>&lt;i&gt;</code> de color plano.</td><td>Mostrar 4 mini <code>&lt;img&gt;</code> de los iconos reales.</td></tr>
+    <tr><td><span class="sev s2">Alto</span></td><td>Navegación escondida: la búsqueda está en el dock y las páginas solo se cambian con chips o deslizando, sin indicador.</td><td>—</td><td>Búsqueda visible arriba o abajo como acción principal, indicador de página y «+ Nueva página» a la vista.</td></tr>
+    <tr><td><span class="sev s3">Medio</span></td><td>El catálogo de «Añadir» usa glifos genéricos.</td><td><code>CATALOG</code> solo tiene glifo y color.</td><td>Logos reales, buscador y categorías.</td></tr>
+    <tr><td><span class="sev s3">Medio</span></td><td>Ajustes sobrecargados (segmentos que se parten en dos líneas, «Refracción»).</td><td>—</td><td>Agrupar en «Apariencia / Disposición / Datos» con una vista previa en vivo y ocultar lo técnico.</td></tr>
+    <tr><td><span class="sev s3">Medio</span></td><td>Accesibilidad: <code>role="tab"</code> sin <code>tablist</code>; el menú y las hojas cerradas siguen en el árbol accesible.</td><td>El menú se oculta con CSS y no con <code>inert</code>/<code>hidden</code>.</td><td>Usar <code>tablist</code>/<code>tabpanel</code> y <code>inert</code> en las capas cerradas.</td></tr>
+    <tr><td><span class="sev s3">Medio</span></td><td>Mucho espacio muerto en móvil: 9 apps ocupan un tercio de la pantalla.</td><td>—</td><td>Sumar «Recientes» y «Fijadas», o pasar a un diseño de colecciones a la vista.</td></tr>
+  </table>
+
+  <h2>3. Propuestas (Stitch)</h2>
+  <div class="props">
+    <div class="prop">
+      <span class="tag">A · Cristal refinado</span>
+      <img src="A-cristal-refinado@2x.png">
+      <h3>Evolución del diseño actual</h3>
+      <ul class="pro"><li>Mantiene la identidad Liquid Glass y la PWA tipo pantalla de inicio.</li><li>Saludo, búsqueda arriba y «Recientes».</li><li>Es el cambio de menor riesgo.</li></ul>
+      <ul class="con"><li>Sigue dependiendo de páginas ocultas.</li><li>El cristal cuesta rendimiento en Android de gama baja.</li></ul>
+      <div class="score"><span>Esfuerzo: bajo</span><span>Navegación: ★★★</span></div>
+    </div>
+    <div class="prop">
+      <span class="tag">B · Búsqueda primero</span>
+      <img src="B-busqueda-primero@2x.png">
+      <h3>Lanzador al estilo Raycast</h3>
+      <ul class="pro"><li>Búsqueda abajo, al alcance del pulgar.</li><li>«Frecuentes» y colecciones en lista, con todo a un toque.</li><li>Claro y legible, sin efectos.</li></ul>
+      <ul class="con"><li>Pierde la sensación de «pantalla de inicio».</li><li>Las colecciones exigen un segundo toque.</li></ul>
+      <div class="score"><span>Esfuerzo: medio</span><span>Navegación: ★★★★★</span></div>
+    </div>
+    <div class="prop">
+      <span class="tag">C · Bento de colecciones</span>
+      <img src="C-bento-colecciones@2x.png">
+      <h3>Todas las colecciones a la vista</h3>
+      <ul class="pro"><li>No hay páginas ocultas: todo se ve de un vistazo.</li><li>Cada colección tiene color e identidad.</li><li>Barra inferior clara (Inicio, Buscar, Añadir, Ajustes).</li></ul>
+      <ul class="con"><li>Con muchas apps por colección necesita «Ver todo».</li><li>Es la reestructuración mayor del <code>Doc</code>.</li></ul>
+      <div class="score"><span>Esfuerzo: medio-alto</span><span>Navegación: ★★★★★</span></div>
+    </div>
+    <div class="prop">
+      <span class="tag">D · Material You</span>
+      <img src="D-material-you@2x.png">
+      <h3>Nativo de Android</h3>
+      <ul class="pro"><li>Accesible, con objetivos táctiles grandes.</li><li>Chips de filtro, «Fijadas» y FAB «Añadir app».</li><li>Encaja con una PWA instalada en Android.</li></ul>
+      <ul class="con"><li>En iOS se siente ajeno.</li><li>Es la opción menos distintiva.</li></ul>
+      <div class="score"><span>Esfuerzo: medio</span><span>Navegación: ★★★★</span></div>
+    </div>
+    <div class="prop wide">
+      <div><span class="tag">E · Escritorio con barra lateral</span><img src="E-escritorio-sidebar@hd.png"></div>
+      <div>
+        <h3>Diseño de escritorio (complementa a cualquiera)</h3>
+        <ul class="pro"><li>Barra lateral de colecciones al estilo Arc o Linear.</li><li>Usa todo el ancho, con cuadrícula de 8 columnas y nombre y dominio en cada app.</li><li>Atajos de teclado y menú «⋯» visible al pasar el ratón.</li></ul>
+        <ul class="con"><li>Necesita un punto de quiebre propio (≥1024 px).</li></ul>
+        <div class="score"><span>Esfuerzo: medio</span><span>Resuelve el hallazgo crítico de escritorio</span></div>
+      </div>
+    </div>
+  </div>
+
+  <h2>4. Recomendación</h2>
+  <div class="rec">
+    <p><b>Primero, los arreglos de base (valen para cualquier propuesta):</b> resolver los iconos de Google y las redirecciones de login, activar las etiquetas por defecto, arreglar el dock en escritorio y la carpeta en lista, y quitar los artefactos de la refracción.</p>
+    <p><b>Después, la dirección:</b> <b>C (Bento)</b> en móvil más <b>E (barra lateral)</b> en escritorio. Ambas comparten el modelo «colecciones a la vista», que es lo que más mejora la navegación. Si prefieres conservar la estética actual, <b>A</b> sumando la búsqueda abajo de <b>B</b> es la alternativa conservadora.</p>
+  </div>
+</main>
+</body>
+</html>

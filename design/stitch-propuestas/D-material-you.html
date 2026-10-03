@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="es"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Estante - Android PWA</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Plus Jakarta Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS with form plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-secondary-fixed": "#121f0e",
+            "secondary": "#54634e",
+            "surface-dim": "#d7dccf",
+            "secondary-fixed": "#d7e8cd",
+            "surface-container": "#ebf0e2",
+            "on-primary-fixed": "#072107",
+            "on-secondary-fixed-variant": "#3c4b37",
+            "surface-container-low": "#f1f5e8",
+            "surface-variant": "#e0e4d7",
+            "on-error": "#ffffff",
+            "on-secondary": "#ffffff",
+            "primary-container": "#4f6b4a",
+            "on-error-container": "#93000a",
+            "primary": "#385334",
+            "tertiary-fixed": "#bcebee",
+            "inverse-surface": "#2d3229",
+            "on-primary": "#ffffff",
+            "tertiary-container": "#3e6b6e",
+            "on-background": "#181d15",
+            "outline": "#737970",
+            "tertiary": "#255356",
+            "on-secondary-container": "#596953",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-highest": "#e0e4d7",
+            "secondary-container": "#d7e8cd",
+            "inverse-primary": "#b0cfa7",
+            "on-primary-fixed-variant": "#334d2f",
+            "on-surface": "#181d15",
+            "outline-variant": "#c3c8be",
+            "on-tertiary-fixed": "#002022",
+            "primary-fixed-dim": "#b0cfa7",
+            "on-tertiary-fixed-variant": "#1f4d50",
+            "on-tertiary-container": "#bbeaed",
+            "background": "#f7fbed",
+            "surface-container-high": "#e5eadd",
+            "on-tertiary": "#ffffff",
+            "primary-fixed": "#cbebc2",
+            "error": "#ba1a1a",
+            "tertiary-fixed-dim": "#a0cfd2",
+            "surface-bright": "#f7fbed",
+            "secondary-fixed-dim": "#bbcbb2",
+            "surface": "#f7fbed",
+            "surface-tint": "#4a6545",
+            "error-container": "#ffdad6",
+            "on-surface-variant": "#434840",
+            "inverse-on-surface": "#eef2e5",
+            "on-primary-container": "#caeac1"
+          },
+          "borderRadius": {
+            "DEFAULT": "1rem",
+            "lg": "2rem",
+            "xl": "3rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "space-lg": "1.5rem",
+            "space-xs": "0.25rem",
+            "gutter-mobile": "0.75rem",
+            "space-sm": "0.5rem",
+            "margin-tablet": "1.5rem",
+            "margin-desktop": "2rem",
+            "space-xl": "2rem",
+            "space-md": "1rem",
+            "gutter": "1rem",
+            "margin": "1rem"
+          },
+          "fontFamily": {
+            "label-md": ["Plus Jakarta Sans"],
+            "title-md": ["Plus Jakarta Sans"],
+            "headline-md": ["Plus Jakarta Sans"],
+            "body-sm": ["Plus Jakarta Sans"],
+            "headline-sm": ["Plus Jakarta Sans"],
+            "title-lg": ["Plus Jakarta Sans"],
+            "label-lg": ["Plus Jakarta Sans"],
+            "label-sm": ["Plus Jakarta Sans"],
+            "headline-lg-mobile": ["Plus Jakarta Sans"],
+            "display-md": ["Plus Jakarta Sans"],
+            "display-lg": ["Plus Jakarta Sans"],
+            "body-lg": ["Plus Jakarta Sans"],
+            "body-md": ["Plus Jakarta Sans"],
+            "title-sm": ["Plus Jakarta Sans"],
+            "headline-lg": ["Plus Jakarta Sans"]
+          },
+          "fontSize": {
+            "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "600" }],
+            "title-md": ["16px", { "lineHeight": "24px", "letterSpacing": "0.15px", "fontWeight": "600" }],
+            "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+            "body-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.4px", "fontWeight": "400" }],
+            "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "500" }],
+            "title-lg": ["22px", { "lineHeight": "28px", "fontWeight": "500" }],
+            "label-lg": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+            "label-sm": ["11px", { "lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "500" }],
+            "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }],
+            "display-md": ["45px", { "lineHeight": "52px", "fontWeight": "600" }],
+            "display-lg": ["57px", { "lineHeight": "64px", "letterSpacing": "-0.25px", "fontWeight": "600" }],
+            "body-lg": ["16px", { "lineHeight": "24px", "letterSpacing": "0.5px", "fontWeight": "400" }],
+            "body-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.25px", "fontWeight": "400" }],
+            "title-sm": ["14px", { "lineHeight": "20px", "letterSpacing": "0.1px", "fontWeight": "600" }],
+            "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface antialiased min-h-screen selection:bg-secondary-container selection:text-on-secondary-fixed flex flex-col justify-between">
+<!-- Mobile Frame Container (Max width for responsive desktop showcase) -->
+<div class="w-full max-w-md mx-auto min-h-screen flex flex-col relative bg-surface shadow-2xl md:my-4 md:rounded-[2.5rem] md:overflow-hidden md:border md:border-outline-variant/30">
+<!-- 1. Android Status Bar (M3 Standard) -->
+<header class="w-full pt-3 px-6 pb-2 flex items-center justify-between text-on-surface select-none z-30">
+<span class="text-label-md font-label-md tracking-tight font-semibold">09:41</span>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[17px] leading-none" data-icon="signal_cellular_4_bar" data-weight="fill" style="font-variation-settings: 'FILL' 1;">signal_cellular_4_bar</span>
+<span class="material-symbols-outlined text-[17px] leading-none" data-icon="wifi" data-weight="fill" style="font-variation-settings: 'FILL' 1;">wifi</span>
+<div class="flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[20px] leading-none rotate-90" data-icon="battery_full" data-weight="fill" style="font-variation-settings: 'FILL' 1;">battery_full</span>
+</div>
+</div>
+</header>
+<!-- Top App Bar & Search Pill Container (Predicted TopAppBar Shared Component logic) -->
+<section class="px-4 pt-1 pb-3">
+<div class="h-14 w-full bg-surface-container rounded-full px-3 flex items-center justify-between transition-all duration-200 hover:bg-surface-container-high focus-within:ring-2 focus-within:ring-primary focus-within:bg-surface-container-lowest">
+<!-- Leading Icon -->
+<button aria-label="Abrir menú" class="w-10 h-10 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-highest active:scale-95 transition-all" type="button">
+<span class="material-symbols-outlined text-2xl" data-icon="menu">menu</span>
+</button>
+<!-- Search Input with placeholder -->
+<div class="flex-1 flex items-center px-2 cursor-text">
+<span class="text-title-md font-title-md text-on-surface-variant/80 select-none truncate">
+            Buscar en tu estante
+          </span>
+</div>
+<!-- Trailing Action Cluster: Mic / Lens + Avatar -->
+<div class="flex items-center gap-1">
+<button aria-label="Búsqueda por voz o imagen" class="w-9 h-9 flex items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container-highest active:scale-95 transition-all" type="button">
+<span class="material-symbols-outlined text-[22px]" data-icon="mic">mic</span>
+</button>
+<!-- Avatar with online dot -->
+<div class="relative ml-1">
+<div class="w-9 h-9 rounded-full ring-2 ring-primary/20 overflow-hidden bg-secondary-container flex items-center justify-center">
+<img class="w-full h-full object-cover" data-alt="A warm organic portrait of a creative professional in soft natural morning sunlight with earthy sage green surroundings, minimalist editorial photography, relaxed artistic vibe, high detail modern portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0kVdJBGwgk0YYLjZw0-x7vyCpUYY1JVEOb--vdnAOITaW4J6T6thiG_49xDFW9yb0u0WEB4Mq790m-_4zTvMI0cC6z343IBu2rGtyTx-A3MsZMYTeCghKRHhvo87Z_d31pWNWezrVcwDRLfS8qlPHdmYGaKf20f02p7NNuokEzsyfKCX15zY8EKuHYLKC47-aL5pz7wyZuZshcwOH8zXnelGyHbHiUXo_GvxK-wlJmfS6oyGuK7KVKd_9HT_xfbVpmaNP6o90PZjI"/>
+</div>
+<span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-primary rounded-full ring-2 ring-surface-container"></span>
+</div>
+</div>
+</div>
+</section>
+<!-- Scrollable Main Content Canvas -->
+<main class="flex-1 overflow-y-auto px-4 pb-28 space-y-5">
+<!-- 3. Horizontal Scrollable Filter Chips -->
+<nav aria-label="Colecciones de filtros" class="w-full overflow-x-auto no-scrollbar -mx-4 px-4 pt-1">
+<div class="flex items-center gap-2 min-w-max pb-1">
+<!-- Chip: Todas -->
+<button class="h-9 px-4 rounded-full border border-outline-variant bg-surface-container-low text-on-surface-variant text-label-lg font-label-lg hover:bg-surface-container active:scale-95 transition-all flex items-center justify-center min-w-[48px]" type="button">
+            Todas
+          </button>
+<!-- Chip: Diario (Selected) -->
+<button class="h-9 px-4 rounded-full bg-secondary-container text-on-secondary-fixed text-label-lg font-label-lg flex items-center gap-1.5 active:scale-95 transition-all min-w-[48px]" type="button">
+<span class="material-symbols-outlined text-[18px]" data-icon="check" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check</span>
+<span>Diario</span>
+</button>
+<!-- Chip: Crear -->
+<button class="h-9 px-4 rounded-full border border-outline-variant bg-surface-container-low text-on-surface-variant text-label-lg font-label-lg hover:bg-surface-container active:scale-95 transition-all flex items-center justify-center min-w-[48px]" type="button">
+            Crear
+          </button>
+<!-- Chip: Ocio -->
+<button class="h-9 px-4 rounded-full border border-outline-variant bg-surface-container-low text-on-surface-variant text-label-lg font-label-lg hover:bg-surface-container active:scale-95 transition-all flex items-center justify-center min-w-[48px]" type="button">
+            Ocio
+          </button>
+<!-- Chip: Trabajo -->
+<button class="h-9 px-4 rounded-full border border-outline-variant bg-surface-container-low text-on-surface-variant text-label-lg font-label-lg hover:bg-surface-container active:scale-95 transition-all flex items-center justify-center min-w-[48px]" type="button">
+            Trabajo
+          </button>
+<!-- Chip: + Nueva -->
+<button class="h-9 px-3.5 rounded-full border border-dashed border-outline text-primary text-label-lg font-label-lg hover:bg-surface-container active:scale-95 transition-all flex items-center gap-1 min-w-[48px]" type="button">
+<span class="material-symbols-outlined text-[18px]" data-icon="add">add</span>
+<span>Nueva</span>
+</button>
+</div>
+</nav>
+<!-- 4. 'Fijadas' Section (Level 1 Display Card 28px rounded corners) -->
+<section class="bg-surface-container-low rounded-3xl p-4 transition-all">
+<div class="flex items-center justify-between mb-3 px-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]" data-icon="keep" data-weight="fill" style="font-variation-settings: 'FILL' 1;">keep</span>
+<h2 class="text-title-md font-title-md text-on-surface tracking-tight">Fijadas</h2>
+</div>
+<span class="text-label-md font-label-md text-on-surface-variant bg-surface-container px-2.5 py-0.5 rounded-full">
+            4 apps
+          </span>
+</div>
+<!-- 4 Large circular brand icons row -->
+<div class="grid grid-cols-4 gap-2 pt-1">
+<!-- Gmail -->
+<div class="flex flex-col items-center group cursor-pointer">
+<div class="w-14 h-14 rounded-full bg-surface-container-lowest flex items-center justify-center shadow-sm group-hover:scale-105 active:scale-95 transition-all duration-200 relative border border-surface-container">
+<!-- M Logo custom visual representation -->
+<svg class="w-7 h-7" fill="none" viewbox="0 0 24 24">
+<path d="M20 4H4C2.9 4 2.01 4.9 2.01 6L2 18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4Z" fill="#F2F5EA"></path>
+<path d="M20 4H4C2.9 4 2 4.9 2 6V6.5L12 13L22 6.5V6C22 4.9 21.1 4 20 4Z" fill="#EA4335"></path>
+<path d="M2 6.5V18C2 19.1 2.9 20 4 20H6V10L2 6.5Z" fill="#C5221F"></path>
+<path d="M22 6.5L18 10V20H20C21.1 20 22 19.1 22 18V6.5Z" fill="#DB4437"></path>
+<path d="M6 20H18V10L12 14.5L6 10V20Z" fill="#4285F4" opacity="0.15"></path>
+</svg>
+</div>
+<span class="mt-2 text-label-md font-label-md text-on-surface tracking-normal group-hover:text-primary transition-colors">Gmail</span>
+</div>
+<!-- WhatsApp -->
+<div class="flex flex-col items-center group cursor-pointer">
+<div class="w-14 h-14 rounded-full bg-[#25D366] flex items-center justify-center shadow-sm group-hover:scale-105 active:scale-95 transition-all duration-200">
+<svg class="w-7 h-7 text-white fill-current" viewbox="0 0 24 24">
+<path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.59 15.36 3.45 16.86L2.05 22L7.3 20.62C8.75 21.41 10.38 21.83 12.04 21.83C17.5 21.83 21.95 17.38 21.95 11.92C21.95 9.27 20.92 6.78 19.05 4.91C17.18 3.03 14.69 2 12.04 2M12.05 3.67C14.25 3.67 16.31 4.53 17.87 6.09C19.42 7.65 20.28 9.72 20.28 11.92C20.28 16.46 16.58 20.15 12.04 20.15C10.56 20.15 9.11 19.76 7.85 19L7.55 18.83L4.43 19.65L5.26 16.61L5.06 16.29C4.24 15 3.8 13.47 3.8 11.91C3.81 7.37 7.5 3.67 12.05 3.67M9.53 7.34C9.36 7.34 9.09 7.4 8.87 7.65C8.65 7.89 8.02 8.48 8.02 9.68C8.02 10.89 8.9 12.05 9.02 12.22C9.14 12.39 10.76 14.88 13.24 15.96C15.3 16.85 15.72 16.68 16.17 16.63C16.62 16.59 17.62 16.03 17.83 15.45C18.04 14.86 18.04 14.36 17.98 14.26C17.92 14.15 17.75 14.09 17.5 13.97C17.25 13.85 16.03 13.25 15.8 13.17C15.58 13.08 15.41 13.04 15.25 13.29C15.08 13.54 14.61 14.09 14.47 14.26C14.33 14.43 14.18 14.45 13.93 14.33C13.68 14.2 12.63 13.86 11.38 12.75C10.41 11.89 9.76 10.82 9.57 10.51C9.38 10.2 9.55 10.03 9.68 9.9C9.79 9.79 9.93 9.6 10.05 9.45C10.18 9.31 10.22 9.2 10.3 9.04C10.39 8.87 10.35 8.73 10.29 8.6C10.22 8.48 9.74 7.34 9.53 7.34Z"></path>
+</svg>
+</div>
+<span class="mt-2 text-label-md font-label-md text-on-surface tracking-normal group-hover:text-primary transition-colors">WhatsApp</span>
+</div>
+<!-- Claude -->
+<div class="flex flex-col items-center group cursor-pointer">
+<div class="w-14 h-14 rounded-full bg-[#D97757] flex items-center justify-center shadow-sm group-hover:scale-105 active:scale-95 transition-all duration-200">
+<!-- Terracotta starburst Claude icon -->
+<svg class="w-8 h-8 text-white fill-current" viewbox="0 0 24 24">
+<path d="M12 2L13.8 8.2L20 7.5L15.6 12L20.2 16.2L14 15.8L12 22L10 15.8L3.8 16.2L8.4 12L4 7.5L10.2 8.2L12 2Z"></path>
+</svg>
+</div>
+<span class="mt-2 text-label-md font-label-md text-on-surface tracking-normal group-hover:text-primary transition-colors">Claude</span>
+</div>
+<!-- Google Maps -->
+<div class="flex flex-col items-center group cursor-pointer">
+<div class="w-14 h-14 rounded-full bg-surface-container-lowest flex items-center justify-center shadow-sm group-hover:scale-105 active:scale-95 transition-all duration-200 border border-surface-container">
+<svg class="w-7 h-7" fill="none" viewbox="0 0 24 24">
+<path d="M12 2C7.58 2 4 5.58 4 10C4 16 12 22 12 22C12 22 20 16 20 10C20 5.58 16.42 2 12 2Z" fill="#34A853"></path>
+<path d="M12 6.5C10.07 6.5 8.5 8.07 8.5 10C8.5 11.93 10.07 13.5 12 13.5C13.93 13.5 15.5 11.93 15.5 10C15.5 8.07 13.93 6.5 12 6.5Z" fill="#4285F4"></path>
+<path d="M12 2C9.79 2 7.79 2.9 6.34 4.34L12 10V2Z" fill="#EA4335"></path>
+<path d="M12 10L17.66 4.34C16.21 2.9 14.21 2 12 2V10Z" fill="#FBBC04"></path>
+</svg>
+</div>
+<span class="mt-2 text-label-md font-label-md text-on-surface tracking-normal group-hover:text-primary transition-colors">Maps</span>
+</div>
+</div>
+</section>
+<!-- 5. App Grid Section: 'Colección Diario' -->
+<section class="space-y-3 pt-1">
+<div class="flex items-baseline justify-between px-1">
+<div>
+<h2 class="text-headline-sm font-headline-sm text-on-surface">Colección Diario</h2>
+<p class="text-body-sm font-body-sm text-on-surface-variant">9 elementos</p>
+</div>
+<button class="text-label-md font-label-md text-primary hover:text-primary-container px-2 py-1 rounded-full hover:bg-surface-container active:scale-95 transition-all" type="button">
+            Organizar
+          </button>
+</div>
+<!-- 4-Column Grid with Android standard touch-targets -->
+<div class="grid grid-cols-4 gap-y-5 gap-x-2 pt-1">
+<!-- 1. Google Calendar (Dynamic 31 OCT style) -->
+<div class="flex flex-col items-center group cursor-pointer">
+<div class="w-14 h-14 rounded-2xl bg-surface-container-lowest border border-outline-variant/40 flex flex-col items-center justify-between overflow-hidden shadow-sm group-hover:scale-105 active:scale-95 transition-all">
+<div class="w-full bg-[#1A73E8] py-0.5 text-center">
+<span class="text-[9px] font-bold text-white uppercase tracking-wider block">OCT</span>
+</div>
+<span class="text-title-lg font-headline-md font-bold text-on-surface leading-none mb-1.5">31</span>
+</div>
+<span class="mt-1.5 text-label-md font-label-md text-on-surface text-center line-clamp-1">Calendario</span>
+</div>
+<!-- 2. Google Drive -->
+<div class="flex flex-col items-center group cursor-pointer">
+<div class="w-14 h-14 rounded-2xl bg-surface-container-lowest border border-outline-variant/40 flex items-center justify-center shadow-sm group-hover:scale-105 active:scale-95 transition-all">
+<svg class="w-7 h-7" fill="none" viewbox="0 0 24 24">
+<path d="M7.71 3.5L1.29 14.5L4.57 20.17L11 9.17L7.71 3.5Z" fill="#0066DA"></path>
+<path d="M16.29 3.5H7.71L11 9.17H22.57L19.29 3.5H16.29Z" fill="#00AC47"></path>
+<path d="M22.57 9.17L16.14 20.17H9.57L12.86 14.5H22.57V9.17Z" fill="#EA4335" opacity="0.1"></path>
+<path d="M16.14 20.17H4.57L1.29 14.5L7.86 14.5L11.14 20.17H16.14Z" fill="#FFBA00"></path>
+</svg>
+</div>
+<span class="mt-1.5 text-label-md font-label-md text-on-surface text-center line-clamp-1">Drive</span>
+</div>
+<!-- 3. Google Fotos -->
+<div class="flex flex-col items-center group cursor-pointer">
+<div class="w-14 h-14 rounded-2xl bg-surface-container-lowest border border-outline-variant/40 flex items-center justify-center shadow-sm group-hover:scale-105 active:scale-95 transition-all">
+<!-- Pinwheel multicolor -->
+<svg class="w-7 h-7" fill="none" viewbox="0 0 24 24">
+<path d="M12 2C14.76 2 17 4.24 17 7V12H12C9.24 12 7 9.76 7 7C7 4.24 9.24 2 12 2Z" fill="#EA4335"></path>
+<path d="M22 12C22 14.76 19.76 17 17 17H12V12C12 9.24 14.24 7 17 7C19.76 7 22 9.24 22 12Z" fill="#FBBC04"></path>
+<path d="M12 22C9.24 22 7 19.76 7 17V12H12C14.76 12 17 14.24 17 17C17 19.76 14.76 22 12 22Z" fill="#34A853"></path>
+<path d="M2 12C2 9.24 4.24 7 7 7H12V12C12 14.76 9.76 17 7 17C4.24 17 2 14.76 2 12Z" fill="#4285F4"></path>
+</svg>
+</div>
+<span class="mt-1.5 text-label-md font-label-md text-on-surface text-center line-clamp-1">Fotos</span>
+</div>
+<!-- 4. Google Keep -->
+<div class="flex flex-col items-center group cursor-pointer">
+<div class="w-14 h-14 rounded-2xl bg-[#FFBA00] flex items-center justify-center shadow-sm group-hover:scale-105 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-white text-[28px]" data-icon="lightbulb" data-weight="fill" style="font-variation-settings: 'FILL' 1;">lightbulb</span>
+</div>
+<span class="mt-1.5 text-label-md font-label-md text-on-surface text-center line-clamp-1">Keep</span>
+</div>
+<!-- 5. YouTube -->
+<div class="flex flex-col items-center group cursor-pointer">
+<div class="w-14 h-14 rounded-2xl bg-[#FF0000] flex items-center justify-center shadow-sm group-hover:scale-105 active:scale-95 transition-all">
+<svg class="w-7 h-7 text-white fill-current" viewbox="0 0 24 24">
+<path d="M10 15L15 12L10 9V15ZM21.58 7.19C21.35 6.33 20.67 5.65 19.81 5.42C18.25 5 12 5 12 5C12 5 5.75 5 4.19 5.42C3.33 5.65 2.65 6.33 2.42 7.19C2 8.75 2 12 2 12C2 12 2 15.25 2.42 16.81C2.65 17.67 3.33 18.35 4.19 18.58C5.75 19 12 19 12 19C12 19 18.25 19 19.81 18.58C20.67 18.35 21.35 17.67 21.58 16.81C22 15.25 22 12 22 12C22 12 22 8.75 21.58 7.19Z"></path>
+</svg>
+</div>
+<span class="mt-1.5 text-label-md font-label-md text-on-surface text-center line-clamp-1">YouTube</span>
+</div>
+<!-- 6. Google Traductor -->
+<div class="flex flex-col items-center group cursor-pointer">
+<div class="w-14 h-14 rounded-2xl bg-[#1A73E8] flex items-center justify-center shadow-sm group-hover:scale-105 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-white text-[28px]" data-icon="translate">translate</span>
+</div>
+<span class="mt-1.5 text-label-md font-label-md text-on-surface text-center line-clamp-1">Traductor</span>
+</div>
+<!-- 7. Google Meet -->
+<div class="flex flex-col items-center group cursor-pointer">
+<div class="w-14 h-14 rounded-2xl bg-surface-container-lowest border border-outline-variant/40 flex items-center justify-center shadow-sm group-hover:scale-105 active:scale-95 transition-all">
+<svg class="w-7 h-7" fill="none" viewbox="0 0 24 24">
+<path d="M15 8V16L19 19V5L15 8Z" fill="#00832D"></path>
+<path d="M13 6.5V17.5C13 18.33 12.33 19 11.5 19H4.5C3.67 19 3 18.33 3 17.5V6.5C3 5.67 3.67 5 4.5 5H11.5C12.33 5 13 5.67 13 6.5Z" fill="#00AC47"></path>
+<path d="M15 12L19 8.5V15.5L15 12Z" fill="#26A69A"></path>
+<circle cx="8" cy="12" fill="#FFFFFF" r="2.5"></circle>
+</svg>
+</div>
+<span class="mt-1.5 text-label-md font-label-md text-on-surface text-center line-clamp-1">Meet</span>
+</div>
+<!-- 8. Google Hojas (Sheets) -->
+<div class="flex flex-col items-center group cursor-pointer">
+<div class="w-14 h-14 rounded-2xl bg-[#0F9D58] flex items-center justify-center shadow-sm group-hover:scale-105 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-white text-[28px]" data-icon="table_chart">table_chart</span>
+</div>
+<span class="mt-1.5 text-label-md font-label-md text-on-surface text-center line-clamp-1">Hojas</span>
+</div>
+<!-- 9. Folder 'Trabajo' (2x2 mini preview) -->
+<div class="flex flex-col items-center group cursor-pointer">
+<div class="w-14 h-14 rounded-2xl bg-surface-container-high border border-outline-variant/60 p-2 grid grid-cols-2 gap-1 shadow-sm group-hover:scale-105 active:scale-95 transition-all">
+<!-- Notion mini -->
+<div class="w-4 h-4 bg-surface-container-lowest rounded-sm flex items-center justify-center text-[8px] font-bold text-black border border-black/10">N</div>
+<!-- Slack mini -->
+<div class="w-4 h-4 bg-[#4A154B] rounded-sm flex items-center justify-center">
+<span class="material-symbols-outlined text-[9px] text-[#ECB22E]" data-icon="hub">hub</span>
+</div>
+<!-- Linear mini -->
+<div class="w-4 h-4 bg-[#5E6AD2] rounded-sm flex items-center justify-center text-[8px] text-white font-bold">L</div>
+<!-- Trello mini -->
+<div class="w-4 h-4 bg-[#0079BF] rounded-sm flex items-center justify-center">
+<span class="material-symbols-outlined text-[9px] text-white" data-icon="view_kanban">view_kanban</span>
+</div>
+</div>
+<span class="mt-1.5 text-label-md font-label-md text-on-surface text-center line-clamp-1 font-semibold">Trabajo</span>
+</div>
+</div>
+</section>
+</main>
+<!-- 6. Extended Floating Action Button (FAB) -->
+<div class="absolute bottom-24 right-4 z-40">
+<button aria-label="Añadir nueva aplicación al estante" class="h-14 px-5 rounded-2xl bg-secondary-container text-on-secondary-fixed shadow-[0px_6px_20px_-2px_rgba(79,107,74,0.25)] hover:shadow-lg hover:bg-secondary-fixed active:scale-95 transition-all duration-200 flex items-center gap-2.5 font-label-lg text-label-lg group border border-outline-variant/30" type="button">
+<span class="material-symbols-outlined text-2xl text-primary group-hover:rotate-90 transition-transform duration-300" data-icon="add">add</span>
+<span class="font-semibold tracking-wide">Añadir app</span>
+</button>
+</div>
+<!-- 7. Bottom Navigation Bar Material 3 (Predicted BottomNavBar Component) -->
+<nav class="fixed md:absolute bottom-0 left-0 right-0 w-full z-50 bg-surface-container border-none pt-2 pb-1 px-4 flex flex-col justify-end">
+<!-- 3 Destinations with M3 Expressive Pill -->
+<div class="flex justify-around items-center h-16 w-full max-w-md mx-auto">
+<!-- Destino 1: Inicio (Active State as per rules: semantic home mapping) -->
+<a class="flex flex-col items-center justify-center text-on-surface group w-20 cursor-pointer" href="#inicio">
+<div class="w-16 h-8 bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center transition-all group-hover:brightness-95">
+<span class="material-symbols-outlined text-2xl text-primary" data-icon="home" data-weight="fill" style="font-variation-settings: 'FILL' 1;">home</span>
+</div>
+<span class="text-label-md font-label-md mt-1 text-primary font-bold tracking-tight">Inicio</span>
+</a>
+<!-- Destino 2: Colecciones (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant group w-20 cursor-pointer hover:text-on-surface" href="#colecciones">
+<div class="w-16 h-8 rounded-full flex items-center justify-center transition-all group-hover:bg-surface-container-highest">
+<span class="material-symbols-outlined text-2xl" data-icon="apps">apps</span>
+</div>
+<span class="text-label-md font-label-md mt-1 font-medium tracking-tight">Colecciones</span>
+</a>
+<!-- Destino 3: Ajustes (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant group w-20 cursor-pointer hover:text-on-surface" href="#ajustes">
+<div class="w-16 h-8 rounded-full flex items-center justify-center transition-all group-hover:bg-surface-container-highest">
+<span class="material-symbols-outlined text-2xl" data-icon="settings">settings</span>
+</div>
+<span class="text-label-md font-label-md mt-1 font-medium tracking-tight">Ajustes</span>
+</a>
+</div>
+<!-- Android System Gesture Navigation Pill -->
+<div class="w-full flex justify-center pb-2 pt-1 select-none">
+<div class="w-32 h-1 bg-on-surface-variant/40 rounded-full"></div>
+</div>
+</nav>
+</div>
+</body></html>
