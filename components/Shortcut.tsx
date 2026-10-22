@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import { Icon } from "@/lib/glyphs";
-import { isFolder, type AppItem, type Folder, type Item } from "@/lib/types";
+import { isFolder, type Folder, type Item } from "@/lib/types";
 import { Ico, hostOf } from "./Tile";
 
 const HOLD_MS = 500;
